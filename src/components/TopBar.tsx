@@ -1,19 +1,15 @@
 interface TopBarProps {
   currentUser: { id: string; name: string } | null
   currentCredits: number
-  canShowInstallButton: boolean
-  isInstalled: boolean
-  onInstallClick: () => Promise<void>
   onMenuClick: () => void
+  onRefreshCredits: () => Promise<void>
 }
 
 export function TopBar({
   currentUser,
   currentCredits,
-  canShowInstallButton,
-  isInstalled,
-  onInstallClick,
   onMenuClick,
+  onRefreshCredits,
 }: TopBarProps) {
   return (
     <header className="topbar">
@@ -23,27 +19,24 @@ export function TopBar({
           <span />
           <span />
         </button>
-        <div>
-        <p className="eyebrow">IPL Questions Game</p>
-        <h1>IPL Gaming Arena</h1>
-        </div>
+        <h1 className="topbar-title">IPL Gaming</h1>
       </div>
       <div className="topbar-right">
         {currentUser ? (
           <div className="credit-pill">
-            <span>{currentUser.name}</span>
-            <strong>{currentCredits} credits</strong>
+            <div className="credit-pill-text">
+              <span>{currentUser.name}</span>
+              <strong style={{ color: 'var(--sun)' }}>{currentCredits} credits</strong>
+            </div>
+            <button
+              type="button"
+              className="refresh-btn"
+              onClick={() => void onRefreshCredits()}
+              aria-label="Refresh credits"
+            >
+              ↻
+            </button>
           </div>
-        ) : null}
-        {canShowInstallButton ? (
-          <button
-            className="install-btn"
-            type="button"
-            onClick={() => void onInstallClick()}
-            disabled={isInstalled}
-          >
-            {isInstalled ? 'Installed' : 'Install App'}
-          </button>
         ) : null}
       </div>
     </header>

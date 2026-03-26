@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react'
 import './App.css'
 import { ApiKeyGate } from './components/ApiKeyGate'
 import { SideMenu, type AppScreen } from './components/SideMenu'
-import { StatusRow } from './components/StatusRow'
 import { TopBar } from './components/TopBar'
 import { api, clearApiKey, getApiKey, type ApiUser } from './lib/api'
 import { repository } from './lib/repository'
@@ -19,14 +18,6 @@ import { HomePage } from './pages/HomePage'
 import { LeaderboardPage } from './pages/LeaderboardPage'
 import { MatchesPage, type MatchFilter } from './pages/MatchesPage'
 import { UserDetailsPage } from './pages/UserDetailsPage'
-
-interface BeforeInstallPromptEvent extends Event {
-  prompt: () => Promise<void>
-  userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>
-}
-
-const INSTALL_COOLDOWN_KEY = 'ipl-install-cooldown-until'
-const INSTALL_COOLDOWN_DAYS = 3
 
 const classifyMatch = (match: Match, now: Date) => {
   const startMs = new Date(match.matchCommenceStartDate).getTime()
@@ -49,30 +40,8 @@ const isSameIstDate = (isoLike: string, now: Date) => {
   return targetDate === nowDate
 }
 
-const isIos = () => /iphone|ipad|ipod/i.test(navigator.userAgent)
-const isSafari = () => {
-  const ua = navigator.userAgent.toLowerCase()
-  return ua.includes('safari') && !ua.includes('chrome') && !ua.includes('android')
-}
-
-const isRunningStandalone = () => {
-  const isStandaloneDisplayMode = window.matchMedia(
-    '(display-mode: standalone)',
-  ).matches
-  const isIosStandalone =
-    'standalone' in navigator &&
-    Boolean((navigator as Navigator & { standalone?: boolean }).standalone)
-
-  return isStandaloneDisplayMode || isIosStandalone
-}
-
 function App() {
-  const [deferredPrompt, setDeferredPrompt] =
-    useState<BeforeInstallPromptEvent | null>(null)
   const [isOffline, setIsOffline] = useState(!navigator.onLine)
-  const [isInstalled, setIsInstalled] = useState(isRunningStandalone())
-  const [isInCooldown, setIsInCooldown] = useState(false)
-  const [installMessage, setInstallMessage] = useState('')
   const [isLoading, setIsLoading] = useState(true)
   const [activeScreen, setActiveScreen] = useState<AppScreen>('home')
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -97,7 +66,6 @@ function App() {
   const [authValidating, setAuthValidating] = useState(() => !!getApiKey())
   const [authError, setAuthError] = useState<string | null>(null)
 
-  const isIosSafari = isIos() && isSafari()
   const now = useMemo(() => new Date(), [clockTick])
 
   const todayMatches = useMemo(() => {
@@ -152,19 +120,6 @@ function App() {
   const selectedHomeMatch = useMemo(
     () => homeMatches.find((item) => item.id === selectedHomeMatchId) ?? null,
     [homeMatches, selectedHomeMatchId],
-  )
-
-  const wins = useMemo(
-    () => history.filter((item) => item.status === 'won').length,
-    [history],
-  )
-  const losses = useMemo(
-    () => history.filter((item) => item.status === 'lost').length,
-    [history],
-  )
-  const penalized = useMemo(
-    () => history.filter((item) => item.status === 'penalized').length,
-    [history],
   )
 
   const refreshGameData = async () => {
@@ -338,33 +293,7 @@ function App() {
     return () => window.clearInterval(id)
   }, [])
 
-  useEffect(() => {
-    const cooldownUntil = Number(localStorage.getItem(INSTALL_COOLDOWN_KEY) ?? '0')
-    setIsInCooldown(cooldownUntil > Date.now())
 
-    const onBeforeInstallPrompt = (event: Event) => {
-      event.preventDefault()
-      setDeferredPrompt(event as BeforeInstallPromptEvent)
-      setInstallMessage('')
-    }
-
-    const onAppInstalled = () => {
-      setIsInstalled(true)
-      setDeferredPrompt(null)
-      setInstallMessage('App installed successfully.')
-    }
-
-    window.addEventListener('beforeinstallprompt', onBeforeInstallPrompt)
-    window.addEventListener('appinstalled', onAppInstalled)
-
-    return () => {
-      window.removeEventListener('beforeinstallprompt', onBeforeInstallPrompt)
-      window.removeEventListener('appinstalled', onAppInstalled)
-    }
-  }, [])
-
-  const canShowInstallButton = !isInstalled
-  const canShowIosHint = !isInstalled && isIosSafari
 
   const saveSelection = async (question: Question, selectedOptionId: number) => {
     if (!currentUser || isClosed(question.closesAtIst)) {
@@ -396,51 +325,7 @@ function App() {
     setCurrentCredits(credits)
   }
 
-  const onInstallClick = async () => {
-    if (isInstalled) {
-      setInstallMessage('App is already installed.')
-      return
-    }
 
-    if (isInCooldown) {
-      setInstallMessage('Install was recently dismissed. Please try again later.')
-      return
-    }
-
-    if (!deferredPrompt) {
-      setInstallMessage(
-        'Install prompt is not available yet. Use browser menu > Install App.',
-      )
-      return
-    }
-
-    try {
-      await deferredPrompt.prompt()
-      const choice = await deferredPrompt.userChoice
-
-      if (choice.outcome === 'dismissed') {
-        const cooldownUntil =
-          Date.now() + INSTALL_COOLDOWN_DAYS * 24 * 60 * 60 * 1000
-        localStorage.setItem(INSTALL_COOLDOWN_KEY, String(cooldownUntil))
-        setIsInCooldown(true)
-        setInstallMessage('Install was dismissed.')
-      } else {
-        setInstallMessage('Install accepted. Finishing setup...')
-      }
-    } catch {
-      setInstallMessage('Install failed. Please try browser menu > Install App.')
-    } finally {
-      // appinstalled may not always fire immediately in all browsers
-      setTimeout(() => {
-        if (isRunningStandalone()) {
-          setIsInstalled(true)
-          setInstallMessage('App installed successfully.')
-        }
-      }, 1200)
-
-      setDeferredPrompt(null)
-    }
-  }
 
   // ── Auth gates ────────────────────────────────────────────────────────────
   if (!isAuthenticated) {
@@ -500,17 +385,13 @@ function App() {
       <TopBar
         currentUser={currentUser}
         currentCredits={currentCredits}
-        canShowInstallButton={canShowInstallButton}
-        isInstalled={isInstalled}
-        onInstallClick={onInstallClick}
         onMenuClick={() => setIsMenuOpen(true)}
+        onRefreshCredits={refreshCredits}
       />
 
-      <StatusRow
-        isOffline={isOffline}
-        canShowIosHint={canShowIosHint}
-        installMessage={installMessage}
-      />
+      {isOffline ? (
+        <div className="offline-banner">Offline mode active</div>
+      ) : null}
 
       {isLoading ? <section className="panel">Loading game data...</section> : null}
 
@@ -548,11 +429,6 @@ function App() {
         <UserDetailsPage
           user={currentUser}
           currentCredits={currentCredits}
-          wins={wins}
-          losses={losses}
-          penalized={penalized}
-          onRefreshCredits={refreshCredits}
-          onOpenHistory={() => setActiveScreen('historyHidden')}
         />
       ) : null}
 

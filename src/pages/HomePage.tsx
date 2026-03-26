@@ -3,12 +3,12 @@ import type { Match, Question } from '../lib/types'
 
 interface HomePageProps {
   todayOrUpcomingMatches: Match[]
-  selectedHomeMatchId: number | null
+  selectedHomeMatchId: string | null
   selectedHomeMatch: Match | null
   questions: Question[]
-  questionSelections: Record<string, string>
-  onSelectHomeMatch: (matchId: number) => void
-  onSaveSelection: (question: Question, selectedOptionId: string) => Promise<void>
+  questionSelections: Record<string, number>
+  onSelectHomeMatch: (matchId: string) => void
+  onSaveSelection: (question: Question, selectedOptionId: number) => Promise<void>
 }
 
 export function HomePage({
@@ -38,13 +38,12 @@ export function HomePage({
               >
                 <div className="match-card-head">
                   <span>
-                    {match.homeTeamCode} vs {match.awayTeamCode}
+                    {match.firstBattingTeamCode} vs {match.secondBattingTeamCode}
                   </span>
-                  <strong>{match.status}</strong>
                 </div>
-                <p>{match.name}</p>
+                <p>{match.matchName}</p>
                 <small>
-                  {toDisplayDate(match.startsAtIst)} | {countdownLabel(match.startsAtIst)}
+                  {toDisplayDate(match.matchCommenceStartDate)} | {countdownLabel(match.matchCommenceStartDate)}
                 </small>
               </button>
             )
@@ -53,11 +52,11 @@ export function HomePage({
       </article>
 
       <article className="panel">
-        <h2>{selectedHomeMatch ? selectedHomeMatch.name : 'No current or upcoming match'}</h2>
+        <h2>{selectedHomeMatch ? selectedHomeMatch.matchName : 'No current or upcoming match'}</h2>
         {selectedHomeMatch ? (
           <p className="subtle">
             {selectedHomeMatch.groundName}, {selectedHomeMatch.city} | Starts{' '}
-            {toDisplayDate(selectedHomeMatch.startsAtIst)}
+            {toDisplayDate(selectedHomeMatch.matchCommenceStartDate)}
           </p>
         ) : (
           <p className="subtle">No matches available right now.</p>
@@ -72,9 +71,9 @@ export function HomePage({
               <div className="question-card" key={question.id}>
                 <div className="question-head">
                   <h3>
-                    {question.order}. {question.text}
+                    {question.sequence}. {question.questionText}
                   </h3>
-                  <span>{question.creditValue} credits</span>
+                  <span>{question.credits} credits</span>
                 </div>
                 <p className="subtle">Closes at {toDisplayDate(question.closesAtIst)}</p>
                 <div className="option-list">
@@ -86,7 +85,7 @@ export function HomePage({
                       onClick={() => void onSaveSelection(question, option.id)}
                       disabled={locked}
                     >
-                      {option.label}
+                      {option.optionText}
                     </button>
                   ))}
                 </div>

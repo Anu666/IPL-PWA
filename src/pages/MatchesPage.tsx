@@ -5,17 +5,14 @@ export type MatchFilter = 'all' | 'active' | 'upcoming' | 'past'
 
 interface MatchesPageProps {
   matches: Match[]
-  selectedMatchId: number | null
+  selectedMatchId: string | null
   selectedMatch: Match | null
   questions: Question[]
   activeFilter: MatchFilter
-  questionSelections: Record<string, string>
-  resolverSelections: Record<string, string>
+  questionSelections: Record<string, number>
   onFilterChange: (nextFilter: MatchFilter) => void
-  onSelectMatch: (matchId: number) => void
-  onSaveSelection: (question: Question, selectedOptionId: string) => Promise<void>
-  onResolveQuestion: (question: Question) => Promise<void>
-  onResolverChange: (questionId: string, selectedOptionId: string) => void
+  onSelectMatch: (matchId: string) => void
+  onSaveSelection: (question: Question, selectedOptionId: number) => Promise<void>
 }
 
 export function MatchesPage({
@@ -25,12 +22,9 @@ export function MatchesPage({
   questions,
   activeFilter,
   questionSelections,
-  resolverSelections,
   onFilterChange,
   onSelectMatch,
   onSaveSelection,
-  onResolveQuestion,
-  onResolverChange,
 }: MatchesPageProps) {
   return (
     <section className="layout-grid">
@@ -70,7 +64,7 @@ export function MatchesPage({
         <div className="match-list">
           {matches.length === 0 ? <p className="subtle">No matches for this filter.</p> : null}
           {matches.map((match) => {
-            const closeLabel = countdownLabel(match.startsAtIst)
+            const closeLabel = countdownLabel(match.matchCommenceStartDate)
             const isActive = selectedMatchId === match.id
             return (
               <button
@@ -81,13 +75,13 @@ export function MatchesPage({
               >
                 <div className="match-card-head">
                   <span>
-                    {match.homeTeamCode} vs {match.awayTeamCode}
+                    {match.firstBattingTeamCode} vs {match.secondBattingTeamCode}
                   </span>
                   <strong>50 credits</strong>
                 </div>
-                <p>{match.name}</p>
+                <p>{match.matchName}</p>
                 <small>
-                  {toDisplayDate(match.startsAtIst)} | {closeLabel}
+                  {toDisplayDate(match.matchCommenceStartDate)} | {closeLabel}
                 </small>
               </button>
             )
@@ -96,11 +90,11 @@ export function MatchesPage({
       </article>
 
       <article className="panel">
-        <h2>{selectedMatch ? selectedMatch.name : 'Select a match'}</h2>
+        <h2>{selectedMatch ? selectedMatch.matchName : 'Select a match'}</h2>
         {selectedMatch ? (
           <p className="subtle">
             {selectedMatch.groundName}, {selectedMatch.city} | Starts{' '}
-            {toDisplayDate(selectedMatch.startsAtIst)}
+            {toDisplayDate(selectedMatch.matchCommenceStartDate)}
           </p>
         ) : null}
 
@@ -113,9 +107,9 @@ export function MatchesPage({
               <div className="question-card" key={question.id}>
                 <div className="question-head">
                   <h3>
-                    {question.order}. {question.text}
+                    {question.sequence}. {question.questionText}
                   </h3>
-                  <span>{question.creditValue} credits</span>
+                  <span>{question.credits} credits</span>
                 </div>
                 <p className="subtle">Closes at {toDisplayDate(question.closesAtIst)}</p>
                 <div className="option-list">
@@ -127,29 +121,13 @@ export function MatchesPage({
                       onClick={() => void onSaveSelection(question, option.id)}
                       disabled={locked}
                     >
-                      {option.label}
+                      {option.optionText}
                     </button>
                   ))}
                 </div>
                 <p className={locked ? 'lock-note locked' : 'lock-note open'}>
                   {locked ? 'Locked: match has started.' : 'Open for picks.'}
                 </p>
-                <div className="resolver-row">
-                  <select
-                    value={resolverSelections[question.id] ?? ''}
-                    onChange={(event) => onResolverChange(question.id, event.target.value)}
-                  >
-                    <option value="">Dev resolve: select correct option</option>
-                    {question.options.map((option) => (
-                      <option key={option.id} value={option.id}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                  <button type="button" onClick={() => void onResolveQuestion(question)}>
-                    Resolve
-                  </button>
-                </div>
               </div>
             )
           })}

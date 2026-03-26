@@ -1,81 +1,56 @@
-export type MatchStatus = 'upcoming' | 'ongoing' | 'completed'
-
-export type QuestionType =
-  | 'match_winner'
-  | 'toss_winner'
-  | 'top_batter_team'
-  | 'top_bowler_team'
-  | 'most_sixes_team'
-
-export type PickStatus =
-  | 'open'
-  | 'locked_pending'
-  | 'won'
-  | 'lost'
-  | 'penalized'
+export type PickStatus = 'open' | 'locked_pending' | 'won' | 'lost' | 'penalized'
 
 export interface Match {
-  id: number
-  name: string
-  status: MatchStatus
-  startsAtIst: string
+  id: string
+  matchDate: string
+  matchName: string
+  matchTime: string
+  gmtMatchTime: string
+  gmtMatchDate: string
+  gmtMatchEndTime: string
+  gmtMatchEndDate: string
+  firstBattingTeamID: number
+  firstBattingTeamName: string
+  firstBattingTeamCode: string
+  secondBattingTeamID: number
+  secondBattingTeamName: string
+  secondBattingTeamCode: string
+  groundID: number
   groundName: string
+  matchCommenceStartDate: string
   city: string
-  homeTeamId: number
-  homeTeamCode: string
+  homeTeamID: number
   homeTeamName: string
-  homeTeamLogo: string
-  awayTeamId: number
-  awayTeamCode: string
+  awayTeamID: number
   awayTeamName: string
-  awayTeamLogo: string
 }
 
-export interface QuestionOption {
-  id: string
-  label: string
+export interface Option {
+  id: number
+  optionText: string
 }
 
 export interface Question {
   id: string
-  matchId: number
-  order: number
-  type: QuestionType
-  text: string
-  options: QuestionOption[]
-  creditValue: number
+  matchId: string
+  questionText: string
+  options: Option[]
+  credits: number
+  sequence: number
+  correctOptionId: number | null
   closesAtIst: string
 }
 
-export interface UserProfile {
-  id: string
-  name: string
-  startingCredits: number
-  createdAt: string
+export interface Answer {
+  questionId: string
+  selectedOption: number
 }
 
-export interface Prediction {
+export interface UserAnswer {
   id: string
+  matchId: string
   userId: string
-  matchId: number
-  questionId: string
-  selectedOptionId: string
-  submittedAt: string
-}
-
-export interface QuestionResult {
-  id: string
-  matchId: number
-  questionId: string
-  correctOptionId: string
-  resolvedAt: string
-}
-
-export interface PickEvaluation {
-  questionId: string
-  status: PickStatus
-  deltaCredits: number
-  note: string
+  answers: Answer[]
 }
 
 export interface LeaderboardRow {
@@ -89,7 +64,7 @@ export interface LeaderboardRow {
 }
 
 export interface UserHistoryEntry {
-  matchId: number
+  matchId: string
   matchName: string
   questionText: string
   selectedOptionLabel: string
@@ -97,40 +72,4 @@ export interface UserHistoryEntry {
   deltaCredits: number
   note: string
   closesAtIst: string
-}
-
-export interface MatchScheduleRoot {
-  Matchsummary: RawScheduleMatch[]
-}
-
-export interface RawScheduleMatch {
-  MatchID: number
-  MatchStatus: string
-  MatchName: string
-  MatchDate: string
-  MatchTime: string
-  MATCH_COMMENCE_START_DATE: string
-  GroundName: string
-  city: string
-  FirstBattingTeamID: number
-  FirstBattingTeamCode: string
-  FirstBattingTeamName: string
-  MatchHomeTeamLogo: string
-  SecondBattingTeamID: number
-  SecondBattingTeamCode: string
-  SecondBattingTeamName: string
-  MatchAwayTeamLogo: string
-}
-
-export interface QuestionTemplate {
-  templateId: string
-  type: QuestionType
-  text: string
-  creditValue: number
-}
-
-export interface QuestionTemplateRoot {
-  defaultQuestionSet: QuestionTemplate[]
-  matchCreditCap: number
-  closeOffsetMinutes: number
 }

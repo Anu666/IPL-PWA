@@ -1,11 +1,13 @@
-import type { UserProfile } from '../lib/types'
+import { useState } from 'react'
+import type { ApiUser } from '../lib/api'
 
 interface UserDetailsPageProps {
-  user: UserProfile | null
+  user: ApiUser | null
   currentCredits: number
   wins: number
   losses: number
   penalized: number
+  onRefreshCredits: () => Promise<void>
   onOpenHistory: () => void
 }
 
@@ -15,8 +17,24 @@ export function UserDetailsPage({
   wins,
   losses,
   penalized,
+  onRefreshCredits,
   onOpenHistory,
 }: UserDetailsPageProps) {
+  const [refreshing, setRefreshing] = useState(false)
+  const [refreshError, setRefreshError] = useState<string | null>(null)
+
+  const handleRefresh = async () => {
+    setRefreshing(true)
+    setRefreshError(null)
+    try {
+      await onRefreshCredits()
+    } catch (e) {
+      setRefreshError(e instanceof Error ? e.message : 'Failed to refresh')
+    } finally {
+      setRefreshing(false)
+    }
+  }
+
   return (
     <section className="panel user-panel">
       <h2>User Details</h2>
@@ -28,16 +46,40 @@ export function UserDetailsPage({
               <strong>{user.name}</strong>
             </div>
             <div className="user-stat-card">
+              <p className="subtle">Email</p>
+              <strong style={{ fontSize: '0.88rem', wordBreak: 'break-all' }}>{user.email}</strong>
+            </div>
+            <div className="user-stat-card">
+              <p className="subtle">Phone</p>
+              <strong>{user.phoneNumber || '—'}</strong>
+            </div>
+            <div className="user-stat-card">
               <p className="subtle">Joined</p>
-              <strong>{new Date(user.createdAt).toLocaleDateString('en-IN')}</strong>
+              <strong>{new Date(user.createdDate).toLocaleDateString('en-IN')}</strong>
             </div>
-            <div className="user-stat-card">
+          </div>
+
+          <h3 className="user-section-title">Credits</h3>
+          <div className="user-credits-row">
+            <div className="user-stat-card" style={{ flex: 1 }}>
               <p className="subtle">Current Credits</p>
-              <strong>{currentCredits}</strong>
+              <strong style={{ fontSize: '1.5rem', color: 'var(--sun)' }}>{currentCredits}</strong>
             </div>
-            <div className="user-stat-card">
-              <p className="subtle">Starting Credits</p>
-              <strong>{user.startingCredits}</strong>
+            <div className="user-credits-refresh">
+              <button
+                type="button"
+                className="tab"
+                disabled={refreshing}
+                onClick={() => void handleRefresh()}
+                aria-label="Refresh credits"
+              >
+                {refreshing ? '…' : '↻'} Refresh
+              </button>
+              {refreshError !== null && (
+                <p style={{ color: 'var(--rose)', fontSize: '0.82rem', margin: '0.4rem 0 0' }}>
+                  {refreshError}
+                </p>
+              )}
             </div>
           </div>
 

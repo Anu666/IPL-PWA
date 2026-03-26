@@ -1,0 +1,36 @@
+{
+  "defaultQuestionSet": [
+    {
+      "templateId": "winner",
+      "type": "match_winner",
+      "text": "Who will win this match?",
+      "creditValue": 15
+    },
+    {
+      "templateId": "toss",
+      "type": "toss_winner",
+      "text": "Who will win the toss?",
+      "creditValue": 10
+    },
+    {
+      "templateId": "top-batter-team",
+      "type": "top_batter_team",
+      "text": "Which team will have the top batter?",
+      "creditValue": 10
+    },
+    {
+      "templateId": "top-bowler-team",
+      "type": "top_bowler_team",
+      "text": "Which team will have the top bowler?",
+      "creditValue": 10
+    },
+    {
+      "templateId": "most-sixes",
+      "type": "most_sixes_team",
+      "text": "Which team will hit more sixes?",
+      "creditValue": 5
+    }
+  ],
+  "matchCreditCap": 50,
+  "closeOffsetMinutes": 0
+}

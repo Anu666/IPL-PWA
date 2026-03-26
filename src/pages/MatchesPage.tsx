@@ -10,6 +10,7 @@ interface MatchesPageProps {
   questions: Question[]
   activeFilter: MatchFilter
   questionSelections: Record<string, number>
+  saveErrors: Record<string, string>
   onFilterChange: (nextFilter: MatchFilter) => void
   onSelectMatch: (matchId: string) => void
   onSaveSelection: (question: Question, selectedOptionId: number) => Promise<void>
@@ -22,6 +23,7 @@ export function MatchesPage({
   questions,
   activeFilter,
   questionSelections,
+  saveErrors,
   onFilterChange,
   onSelectMatch,
   onSaveSelection,
@@ -106,12 +108,16 @@ export function MatchesPage({
             return (
               <div className="question-card" key={question.id}>
                 <div className="question-head">
+                  <div className="question-head-top">
+                    <span className="question-credits">{question.credits} credits</span>
+                    <span className={locked ? 'lock-note locked' : 'lock-note open'}>
+                      {locked ? '🔒 Locked' : '✓ Open'}
+                    </span>
+                  </div>
                   <h3>
                     {question.sequence}. {question.questionText}
                   </h3>
-                  <span>{question.credits} credits</span>
                 </div>
-                <p className="subtle">Closes at {toDisplayDate(question.closesAtIst)}</p>
                 <div className="option-list">
                   {question.options.map((option) => (
                     <button
@@ -125,9 +131,9 @@ export function MatchesPage({
                     </button>
                   ))}
                 </div>
-                <p className={locked ? 'lock-note locked' : 'lock-note open'}>
-                  {locked ? 'Locked: match has started.' : 'Open for picks.'}
-                </p>
+                {saveErrors[question.id] ? (
+                  <p className="save-error">{saveErrors[question.id]}</p>
+                ) : null}
               </div>
             )
           })}

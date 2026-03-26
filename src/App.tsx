@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import './App.css'
 import { ApiKeyGate } from './components/ApiKeyGate'
 import { SideMenu, type AppScreen } from './components/SideMenu'
@@ -60,6 +60,10 @@ function App() {
   const [currentCredits, setCurrentCredits] = useState(0)
   const [currentUser, setCurrentUser] = useState<ApiUser | null>(null)
   const [clockTick, setClockTick] = useState(0)
+  // Per-question save error: questionId -> error message
+  const [saveErrors, setSaveErrors] = useState<Record<string, string>>({})
+  // Tracks match IDs that currently have a save in-flight to prevent concurrent requests
+  const savingMatchIds = useRef<Set<string>>(new Set())
 
   // ── Auth state ────────────────────────────────────────────────────────────
   const [isAuthenticated, setIsAuthenticated] = useState(() => !!getApiKey())
@@ -299,6 +303,13 @@ function App() {
     if (!currentUser || isClosed(question.closesAtIst)) {
       return
     }
+    // Prevent concurrent saves for the same match (e.g. rapid option clicks)
+    if (savingMatchIds.current.has(question.matchId)) {
+      return
+    }
+    savingMatchIds.current.add(question.matchId)
+    // Clear any previous error for this question
+    setSaveErrors((prev) => { const next = { ...prev }; delete next[question.id]; return next })
 
     const nextSelections = { ...questionSelections, [question.id]: selectedOptionId }
     setQuestionSelections(nextSelections)
@@ -310,19 +321,28 @@ function App() {
       .map((q) => ({ questionId: q.id, selectedOption: nextSelections[q.id] }))
 
     const existingId = userAnswerIds[question.matchId]
-    const saved = await repository.saveUserAnswer(
-      question.matchId,
-      currentUser.id,
-      answers,
-      existingId,
-    )
-
-    if (!existingId) {
-      setUserAnswerIds((prev) => ({ ...prev, [question.matchId]: saved.id }))
+    try {
+      const saved = await repository.saveUserAnswer(
+        question.matchId,
+        currentUser.id,
+        answers,
+        existingId,
+      )
+      if (!existingId) {
+        setUserAnswerIds((prev) => ({ ...prev, [question.matchId]: saved.id }))
+      }
+    } catch (e) {
+      const raw = e instanceof Error ? e.message : 'Failed to save pick'
+      // Extract the message field from the JSON body if present
+      const match = raw.match(/^\[\d+\] (.+)$/)
+      let msg = match ? match[1] : raw
+      try { msg = (JSON.parse(msg) as { message?: string }).message ?? msg } catch { /* not JSON */ }
+      setSaveErrors((prev) => ({ ...prev, [question.id]: msg }))
+      // Revert optimistic selection
+      setQuestionSelections((prev) => { const next = { ...prev }; delete next[question.id]; return next })
+    } finally {
+      savingMatchIds.current.delete(question.matchId)
     }
-
-    const credits = await api.users.getCredits()
-    setCurrentCredits(credits)
   }
 
 
@@ -397,12 +417,10 @@ function App() {
 
       {!isLoading && activeScreen === 'home' ? (
         <HomePage
-          todayOrUpcomingMatches={homeMatches}
-          selectedHomeMatchId={selectedHomeMatchId}
-          selectedHomeMatch={selectedHomeMatch}
+          match={selectedHomeMatch}
           questions={homeQuestions}
           questionSelections={questionSelections}
-          onSelectHomeMatch={setSelectedHomeMatchId}
+          saveErrors={saveErrors}
           onSaveSelection={saveSelection}
         />
       ) : null}
@@ -415,6 +433,7 @@ function App() {
           questions={questions}
           activeFilter={matchFilter}
           questionSelections={questionSelections}
+          saveErrors={saveErrors}
           onFilterChange={setMatchFilter}
           onSelectMatch={setSelectedMatchId}
           onSaveSelection={saveSelection}

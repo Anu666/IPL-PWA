@@ -245,6 +245,41 @@ body.menu-open {
   gap: 1rem;
 }
 
+.home-panel {
+  max-width: 720px;
+}
+
+.home-match-header {
+  margin-bottom: 1.25rem;
+}
+
+.home-match-teams {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.3rem;
+}
+
+.home-team {
+  font-family: 'Bebas Neue', system-ui, sans-serif;
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+
+.home-vs {
+  font-size: 0.85rem;
+  opacity: 0.55;
+  font-weight: 600;
+  padding: 0 0.1rem;
+}
+
+.home-match-name {
+  margin: 0 0 0.25rem;
+  font-weight: 600;
+  opacity: 0.85;
+}
+
 .home-match-list {
   display: grid;
   gap: 0.75rem;
@@ -360,11 +395,24 @@ body.menu-open {
 
 .question-head {
   display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 0.25rem;
+}
+
+.question-head-top {
+  display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 0.8rem;
-  margin-bottom: 0.1rem;
+  gap: 0.5rem;
+}
+
+.question-credits {
+  font-size: 0.78rem;
+  color: var(--sun);
+  font-weight: 700;
+  white-space: nowrap;
+  letter-spacing: 0.03em;
 }
 
 .question-head h3 {
@@ -416,8 +464,9 @@ body.menu-open {
 }
 
 .lock-note {
-  margin: 0.6rem 0;
-  font-size: 0.85rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 .lock-note.open {
@@ -426,6 +475,12 @@ body.menu-open {
 
 .lock-note.locked {
   color: #ff8fa3;
+}
+
+.save-error {
+  margin: 0.5rem 0 0;
+  font-size: 0.82rem;
+  color: var(--rose);
 }
 
 .resolver-row {

@@ -43,10 +43,12 @@ export const countdownLabel = (targetIso: string, now = new Date()) => {
     return 'Closed'
   }
 
-  const totalMinutes = Math.floor(ms / 60000)
+  const totalSeconds = Math.floor(ms / 1000)
+  const totalMinutes = Math.floor(totalSeconds / 60)
   const days = Math.floor(totalMinutes / (24 * 60))
   const hours = Math.floor((totalMinutes % (24 * 60)) / 60)
   const minutes = totalMinutes % 60
+  const seconds = totalSeconds % 60
 
   if (days > 0) {
     return `${days}d ${hours}h left`
@@ -54,6 +56,10 @@ export const countdownLabel = (targetIso: string, now = new Date()) => {
 
   if (hours > 0) {
     return `${hours}h ${minutes}m left`
+  }
+
+  if (totalMinutes < 10) {
+    return `${minutes}m ${seconds}s left`
   }
 
   return `${minutes}m left`

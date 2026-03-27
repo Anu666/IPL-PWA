@@ -16,7 +16,7 @@ export default defineConfig({
         enabled: true,
         suppressWarnings: true,
       },
-      includeAssets: ['vite.svg', 'icons/pwa-192x192.png', 'icons/pwa-512x512.png'],
+      includeAssets: ['icons/ipl-gaming.png'],
       manifest: {
         name: 'IPL Gaming',
         short_name: 'IPL Gaming',
@@ -28,14 +28,15 @@ export default defineConfig({
         scope: BASE_PATH,
         icons: [
           {
-            src: `${BASE_PATH}icons/pwa-192x192.png`,
+            src: `${BASE_PATH}icons/ipl-gaming.png`,
             sizes: '192x192',
             type: 'image/png',
           },
           {
-            src: `${BASE_PATH}icons/pwa-512x512.png`,
+            src: `${BASE_PATH}icons/ipl-gaming.png`,
             sizes: '512x512',
             type: 'image/png',
+            purpose: 'any maskable',
           },
         ],
       },

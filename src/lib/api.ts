@@ -1,6 +1,7 @@
-import type { Answer, Question, UserAnswer, MatchStatusRecord } from './types'
+import type { Answer, Question, UserAnswer } from './types'
 
-const BASE_URL = 'https://localhost:44331'
+const BASE_URL = 'https://iplgaming20260322122951-axd9czg3bzewdeez.centralus-01.azurewebsites.net'
+// const BASE_URL = 'https://localhost:44331'
 const STORAGE_KEY = 'ipl-api-key'
 
 export const getApiKey = () => localStorage.getItem(STORAGE_KEY)
@@ -47,7 +48,15 @@ interface ApiQuestion {
   correctOptionId: number | null
 }
 
+interface MatchStatusResponse {
+  matchId: string
+  status: number
+}
+
 export const api = {
+  matchStatuses: {
+    getAll: () => request<MatchStatusResponse[]>('/api/matchstatuses'),
+  },
   users: {
     getMe: () => request<MeResponse>('/api/users/me'),
     getCredits: async () => {
@@ -79,9 +88,6 @@ export const api = {
         method: 'PUT',
         body: JSON.stringify(body),
       }),
-  },
-  matchStatuses: {
-    getAll: () => request<MatchStatusRecord[]>('/api/matchstatus/GetAllMatchStatuses'),
   },
 }
 

@@ -13,6 +13,7 @@ import type {
   Question,
   UserHistoryEntry,
 } from './lib/types'
+import { MatchStatusValue } from './lib/types'
 import { HistoryPage } from './pages/HistoryPage'
 import { HomePage } from './pages/HomePage'
 import { LeaderboardPage } from './pages/LeaderboardPage'
@@ -60,6 +61,7 @@ function App() {
   const [currentCredits, setCurrentCredits] = useState(0)
   const [currentUser, setCurrentUser] = useState<ApiUser | null>(null)
   const [clockTick, setClockTick] = useState(0)
+  const [matchStatuses, setMatchStatuses] = useState<Record<string, number>>({})
   // Per-question save error: questionId -> error message
   const [saveErrors, setSaveErrors] = useState<Record<string, string>>({})
   // Tracks match IDs that currently have a save in-flight to prevent concurrent requests
@@ -121,9 +123,20 @@ function App() {
     [filteredMatches, selectedMatchId],
   )
 
+  const homeMatchPool = useMemo(() => {
+    const nonStarted = matches.filter(
+      (m) => (matchStatuses[m.id] ?? MatchStatusValue.NotStarted) !== MatchStatusValue.NotStarted,
+    ).sort(
+      (a, b) => new Date(a.matchCommenceStartDate).getTime() - new Date(b.matchCommenceStartDate).getTime(),
+    )
+    if (nonStarted.length > 0) return nonStarted
+    // Fall back to the original homeMatches (nearest upcoming / today)
+    return homeMatches
+  }, [matches, matchStatuses, homeMatches])
+
   const selectedHomeMatch = useMemo(
-    () => homeMatches.find((item) => item.id === selectedHomeMatchId) ?? null,
-    [homeMatches, selectedHomeMatchId],
+    () => homeMatchPool.find((item) => item.id === selectedHomeMatchId) ?? null,
+    [homeMatchPool, selectedHomeMatchId],
   )
 
   const refreshGameData = async () => {
@@ -138,6 +151,15 @@ function App() {
     setMatches(allMatches)
     setSelectedMatchId((prev) => prev ?? firstMatchId)
     setSelectedHomeMatchId((prev) => prev ?? firstMatchId)
+
+    try {
+      const allStatuses = await api.matchStatuses.getAll()
+      const statusMap: Record<string, number> = {}
+      for (const s of allStatuses) { statusMap[s.matchId] = s.status }
+      setMatchStatuses(statusMap)
+    } catch {
+      // statuses are non-critical; silently ignore failures
+    }
 
     const nextHistory = await repository.getUserHistory(apiUser.id)
     const nextLeaderboard = await repository.getLeaderboard()
@@ -266,16 +288,16 @@ function App() {
   }, [filteredMatches, selectedMatchId])
 
   useEffect(() => {
-    if (homeMatches.length === 0) {
+    if (homeMatchPool.length === 0) {
       setSelectedHomeMatchId(null)
       return
     }
 
-    const isVisible = homeMatches.some((match) => match.id === selectedHomeMatchId)
+    const isVisible = homeMatchPool.some((match) => match.id === selectedHomeMatchId)
     if (!isVisible) {
-      setSelectedHomeMatchId(homeMatches[0].id)
+      setSelectedHomeMatchId(homeMatchPool[0].id)
     }
-  }, [homeMatches, selectedHomeMatchId])
+  }, [homeMatchPool, selectedHomeMatchId])
 
   useEffect(() => {
     if (!isMenuOpen) {
@@ -418,9 +440,13 @@ function App() {
       {!isLoading && activeScreen === 'home' ? (
         <HomePage
           match={selectedHomeMatch}
+          homeMatches={homeMatchPool}
+          selectedHomeMatchId={selectedHomeMatchId}
           questions={homeQuestions}
           questionSelections={questionSelections}
           saveErrors={saveErrors}
+          matchStatuses={matchStatuses}
+          onSelectMatch={setSelectedHomeMatchId}
           onSaveSelection={saveSelection}
         />
       ) : null}
@@ -434,6 +460,7 @@ function App() {
           activeFilter={matchFilter}
           questionSelections={questionSelections}
           saveErrors={saveErrors}
+          matchStatuses={matchStatuses}
           onFilterChange={setMatchFilter}
           onSelectMatch={setSelectedMatchId}
           onSaveSelection={saveSelection}

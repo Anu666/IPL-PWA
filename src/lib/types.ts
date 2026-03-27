@@ -1,5 +1,30 @@
 export type PickStatus = 'open' | 'locked_pending' | 'won' | 'lost' | 'penalized'
 
+export const MatchStatusValue = {
+  NotStarted: 0,
+  ReadyForPicks: 1,
+  PicksClosed: 2,
+  BetsUpdated: 3,
+  MatchCompleted: 4,
+  BetsSettled: 5,
+} as const
+export type MatchStatusValue = (typeof MatchStatusValue)[keyof typeof MatchStatusValue]
+
+export const MATCH_STATUS_LABELS: Record<number, string> = {
+  0: 'Not Started',
+  1: 'Ready for Picks',
+  2: 'Picks Closed',
+  3: 'Bets Updated',
+  4: 'Match Completed',
+  5: 'Bets Settled',
+}
+
+export interface MatchStatusRecord {
+  id: string
+  matchId: string
+  status: number
+}
+
 export interface Match {
   id: string
   matchDate: string

@@ -249,6 +249,111 @@ body.menu-open {
   max-width: 720px;
 }
 
+/* ── Home page wrapper ───────────────────────────────────────────────────── */
+.home-wrapper {
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.home-wrapper > .home-panel {
+  max-width: 100%;
+  margin: 0;
+}
+
+/* ── Status filter chips (outside card) ──────────────────────────────────── */
+.home-status-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.home-status-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid #ffffff22;
+  background: #ffffff0a;
+  color: #ffffff99;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.home-status-filter-chip:hover {
+  background: #ffffff16;
+  border-color: #ffffff33;
+  color: #fff;
+}
+
+/* Active state colours per status */
+.home-status-filter-chip--1.active { background: #ffb70322; border-color: var(--sun); color: var(--sun); }
+.home-status-filter-chip--2.active { background: #ef476f22; border-color: #ef476f; color: #ff8fa3; }
+.home-status-filter-chip--3.active { background: #219ebc22; border-color: #219ebc; color: #6dd5ed; }
+.home-status-filter-chip--4.active { background: #7ad99522; border-color: var(--mint); color: var(--mint); }
+.home-status-filter-chip--5.active { background: #7ad99533; border-color: var(--mint); color: var(--mint); }
+
+.home-status-filter-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 0.3rem;
+  border-radius: 999px;
+  background: #ffffff18;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* ── Home match switcher chips (inside card) ─────────────────────────────── */
+.home-match-chips {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.home-match-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+  padding: 0.55rem 0.8rem;
+  border-radius: 0.75rem;
+  border: 1px solid #ffffff22;
+  background: #ffffff0a;
+  color: var(--paper);
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  transition: background 0.15s, border-color 0.15s;
+  flex: 1 1 160px;
+}
+
+.home-match-chip:hover {
+  background: #ffffff16;
+  border-color: #ffffff33;
+}
+
+.home-match-chip.active {
+  border-color: var(--sun);
+  background: #ffb70318;
+}
+
+.home-match-chip-teams {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
 .home-match-header {
   margin-bottom: 1.25rem;
 }
@@ -475,6 +580,38 @@ body.menu-open {
 
 .lock-note.locked {
   color: #ff8fa3;
+}
+
+/* ── Match status chip (PWA) ─────────────────────────────────────────────── */
+.match-status-chip {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+.match-status-chip--0 { background: #ffffff0d; border-color: #ffffff18; color: #ffffff55; }
+.match-status-chip--1 { background: #ffb70322; border-color: #ffb70355; color: var(--sun); }
+.match-status-chip--2 { background: #ef476f22; border-color: #ef476f55; color: #ff8fa3; }
+.match-status-chip--3 { background: #219ebc22; border-color: #219ebc55; color: #6dd5ed; }
+.match-status-chip--4 { background: #7ad99522; border-color: #7ad99555; color: var(--mint); }
+.match-status-chip--5 { background: #7ad99533; border-color: #7ad99577; color: var(--mint); }
+
+/* ── Picks gated notice ──────────────────────────────────────────────────── */
+.picks-gated-notice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 2rem 1rem;
+  text-align: center;
+}
+.picks-gated-notice p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #ffffff77;
 }
 
 .save-error {

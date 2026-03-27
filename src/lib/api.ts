@@ -1,4 +1,4 @@
-import type { Answer, Question, UserAnswer } from './types'
+import type { Answer, Question, UserAnswer, MatchStatusRecord } from './types'
 
 const BASE_URL = 'https://localhost:44331'
 const STORAGE_KEY = 'ipl-api-key'
@@ -79,6 +79,9 @@ export const api = {
         method: 'PUT',
         body: JSON.stringify(body),
       }),
+  },
+  matchStatuses: {
+    getAll: () => request<MatchStatusRecord[]>('/api/matchstatus/GetAllMatchStatuses'),
   },
 }
 

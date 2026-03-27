@@ -34,6 +34,7 @@ export function MatchesPage({
 }: MatchesPageProps) {
   // 1-second tick when selected match is in its final 10 minutes (for instant lock flip)
   const [, setSecondTick] = useState(0)
+  const [showStatsModal, setShowStatsModal] = useState(false)
   useEffect(() => {
     if (!selectedMatch) return
     const msToStart = new Date(selectedMatch.matchCommenceStartDate).getTime() - Date.now()
@@ -54,6 +55,7 @@ export function MatchesPage({
   const selectedEffectiveStatus = selectedMatch ? getEffectiveStatus(selectedMatch) : MatchStatusValue.NotStarted
   const picksOpen = selectedEffectiveStatus === MatchStatusValue.ReadyForPicks
   const questionsVisible = selectedEffectiveStatus !== MatchStatusValue.NotStarted
+  const showBettingStats = selectedEffectiveStatus >= MatchStatusValue.BetsUpdated
 
   return (
     <section className="layout-grid">
@@ -143,6 +145,11 @@ export function MatchesPage({
           </div>
         ) : null}
 
+        {showBettingStats && questions.some((q) => q.bettingStats) ? (
+          <button type="button" className="pwa-stats-btn" onClick={() => setShowStatsModal(true)}>
+            📊 View Betting Stats
+          </button>
+        ) : null}
         {questionsVisible ? (
           <div className="question-list">
             {questions.map((question) => {
@@ -178,12 +185,126 @@ export function MatchesPage({
                   {saveErrors[question.id] ? (
                     <p className="save-error">{saveErrors[question.id]}</p>
                   ) : null}
+
+                  {/* Inline personal outcome — visible when BetsUpdated or beyond */}
+                  {showBettingStats && question.bettingStats ? (() => {
+                    const stats = question.bettingStats!
+                    const allOtherOptionsUnvoted = selectedOption !== undefined &&
+                      stats.optionStats.filter((os) => os.optionId !== selectedOption).every((os) => os.voteCount === 0)
+                    if (stats.totalVotes === 0) {
+                      return (
+                        <div className="pwa-outcome-line">
+                          <span className="pwa-outcome-nobonus">No bonus · No loss</span>
+                        </div>
+                      )
+                    }
+                    if (selectedOption === undefined) {
+                      const allOptionsHaveVoters = stats.optionStats.every((os) => os.voteCount > 0)
+                      return (
+                        <div className="pwa-outcome-line">
+                          <span className="pwa-outcome-wrong">
+                            Not answered · {allOptionsHaveVoters ? `−${question.credits} cr auto-loss` : `May lose −${question.credits} cr`}
+                          </span>
+                        </div>
+                      )
+                    }
+                    const myOptionStat = stats.optionStats.find((os) => os.optionId === selectedOption)
+                    const bonus = myOptionStat?.potentialWinCredits ?? 0
+                    return (
+                      <div className="pwa-outcome-line">
+                        {bonus > 0 ? (
+                          <span className="pwa-outcome-correct">If correct: +{bonus.toFixed(2)} cr</span>
+                        ) : (
+                          <span className="pwa-outcome-nobonus">If correct: No bonus</span>
+                        )}
+                        <span className="pwa-outcome-sep">·</span>
+                        {allOtherOptionsUnvoted ? (
+                          <span className="pwa-outcome-nobonus">If wrong: No loss</span>
+                        ) : (
+                          <span className="pwa-outcome-wrong">If wrong: −{question.credits} cr</span>
+                        )}
+                      </div>
+                    )
+                  })() : null}
                 </div>
               )
             })}
           </div>
         ) : null}
       </article>
+
+      {showStatsModal ? (
+        <div className="pwa-stats-modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) setShowStatsModal(false) }}>
+          <div className="pwa-stats-modal">
+            <div className="pwa-stats-modal-header">
+              <h3>Betting Stats</h3>
+              <button type="button" className="pwa-stats-modal-close" onClick={() => setShowStatsModal(false)}>✕</button>
+            </div>
+            <div className="pwa-stats-modal-body">
+              {questions.filter((q) => q.bettingStats).map((question) => {
+                const selectedOption = questionSelections[question.id]
+                return (
+                  <div key={question.id} className="pwa-stats-modal-question">
+                    <div className="pwa-stats-modal-question-title">
+                      {question.sequence}. {question.questionText}
+                    </div>
+                    <div className="pwa-betting-summary">
+                      <span className="pwa-stat-pill">{question.bettingStats!.totalEligible} eligible</span>
+                      <span className="pwa-stat-pill pwa-stat-pill--green">{question.bettingStats!.totalVotes} answered</span>
+                      {question.bettingStats!.unansweredCount > 0 && (
+                        <span className="pwa-stat-pill pwa-stat-pill--red">
+                          {question.bettingStats!.unansweredCount} unanswered
+                        </span>
+                      )}
+                    </div>
+                    <div className="pwa-option-stats">
+                      {question.bettingStats!.optionStats.map((os) => {
+                        const option = question.options.find((o) => o.id === os.optionId)
+                        const pct = question.bettingStats!.totalEligible > 0
+                          ? (os.voteCount / question.bettingStats!.totalEligible) * 100
+                          : 0
+                        const isMyPick = selectedOption === os.optionId
+                        return (
+                          <div key={os.optionId} className={`pwa-option-stat${isMyPick ? ' pwa-option-stat--mine' : ''}`}>
+                            <div className="pwa-option-stat-row">
+                              <span className="pwa-option-stat-name">
+                                {option?.optionText ?? `Option ${os.optionId}`}
+                              </span>
+                              <span className="pwa-option-stat-count">
+                                {os.voteCount}/{question.bettingStats!.totalEligible}
+                              </span>
+                              {os.potentialWinCredits > 0 ? (
+                                <span className="pwa-option-win">+{os.potentialWinCredits.toFixed(2)} cr</span>
+                              ) : (
+                                <span className="pwa-option-nowin">No bonus</span>
+                              )}
+                            </div>
+                            <div className="pwa-bar-track">
+                              <div
+                                className={`pwa-bar-fill pwa-bar-fill--${os.optionId}`}
+                                style={{ width: `${pct}%` }}
+                              />
+                            </div>
+                            {os.voters.length > 0 && (
+                              <div className="pwa-voter-chips">
+                                {os.voters.map((v) => (
+                                  <span key={v.userId} className={`pwa-voter-chip${selectedOption === os.optionId ? ' pwa-voter-chip--mine' : ''}`}>
+                                    {v.userName}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      ) : null}
     </section>
   )
 }

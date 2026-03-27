@@ -55,6 +55,25 @@ export interface Option {
   optionText: string
 }
 
+export interface VoterInfo {
+  userId: string
+  userName: string
+}
+
+export interface OptionBettingStats {
+  optionId: number
+  voteCount: number
+  voters: VoterInfo[]
+  potentialWinCredits: number
+}
+
+export interface QuestionBettingStats {
+  totalEligible: number
+  totalVotes: number
+  unansweredCount: number
+  optionStats: OptionBettingStats[]
+}
+
 export interface Question {
   id: string
   matchId: string
@@ -64,6 +83,7 @@ export interface Question {
   sequence: number
   correctOptionId: number | null
   closesAtIst: string
+  bettingStats?: QuestionBettingStats | null
 }
 
 export interface Answer {

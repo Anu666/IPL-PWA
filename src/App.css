@@ -620,6 +620,297 @@ body.menu-open {
   color: var(--rose);
 }
 
+/* ── PWA Betting Stats panel (inside question card) ─────────────────────── */
+.pwa-betting-stats {
+  margin-top: 0.85rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid #ffffff10;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.pwa-betting-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.pwa-stat-pill {
+  font-size: 0.72rem;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid #ffffff18;
+  background: #ffffff09;
+  opacity: 0.85;
+}
+
+.pwa-stat-pill--green {
+  border-color: #7ad99540;
+  background: #7ad99510;
+  color: var(--mint);
+  opacity: 1;
+}
+
+.pwa-stat-pill--red {
+  border-color: #ef476f40;
+  background: #ef476f10;
+  color: #ff8fa3;
+  opacity: 1;
+}
+
+.pwa-option-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.pwa-option-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+/* Highlight the user's own pick */
+.pwa-option-stat--mine .pwa-option-stat-name {
+  color: var(--sun);
+  font-weight: 700;
+}
+
+.pwa-option-stat-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+}
+
+.pwa-option-stat-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pwa-option-stat-count {
+  font-size: 0.74rem;
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+
+.pwa-option-win {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--mint);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.pwa-option-nowin {
+  font-size: 0.72rem;
+  opacity: 0.3;
+  flex-shrink: 0;
+}
+
+.pwa-bar-track {
+  height: 5px;
+  border-radius: 999px;
+  background: #ffffff12;
+  overflow: hidden;
+}
+
+.pwa-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.5s ease;
+}
+
+.pwa-bar-fill--1 {
+  background: linear-gradient(90deg, var(--teal), #3a86ff);
+}
+
+.pwa-bar-fill--2 {
+  background: linear-gradient(90deg, var(--sun), var(--flame));
+}
+
+/* ── Inline personal outcome line ──────────────────────── */
+.pwa-outcome-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.5rem;
+  font-size: 0.78rem;
+  margin-top: 0.9rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.pwa-outcome-correct {
+  font-weight: 600;
+  color: var(--mint);
+}
+
+.pwa-outcome-nobonus {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.pwa-outcome-wrong {
+  color: #ff8fa3;
+}
+
+.pwa-outcome-sep {
+  opacity: 0.3;
+}
+
+/* ── "View Betting Stats" trigger button ───────────────── */
+.pwa-stats-btn {
+  display: block;
+  width: 100%;
+  margin-bottom: 0.75rem;
+  padding: 0.55rem 1rem;
+  border-radius: 0.6rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.15s;
+}
+
+.pwa-stats-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* ── Full-stats modal ───────────────────────────────────── */
+.pwa-stats-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 200;
+  padding: 0;
+  touch-action: none;
+  overscroll-behavior: contain;
+}
+
+@media (min-width: 640px) {
+  .pwa-stats-modal-overlay {
+    align-items: center;
+    padding: 1.5rem;
+  }
+}
+
+.pwa-stats-modal {
+  background: #1a1a2e;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1.2rem 1.2rem 0 0;
+  width: 100%;
+  max-height: 85dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+@media (min-width: 640px) {
+  .pwa-stats-modal {
+    max-width: 520px;
+    border-radius: 1.2rem;
+    max-height: 80dvh;
+  }
+}
+
+.pwa-stats-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.2rem 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+.pwa-stats-modal-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.pwa-stats-modal-close {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.4rem;
+  line-height: 1;
+}
+
+.pwa-stats-modal-close:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.pwa-stats-modal-body {
+  overflow-y: auto;
+  padding: 1rem 1.2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.pwa-stats-modal-question {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding-bottom: 1.1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.pwa-stats-modal-question:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.pwa-stats-modal-question-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.35;
+  opacity: 0.9;
+}
+
+/* ── Voter name chips inside modal ──────────────────────── */
+.pwa-voter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.25rem;
+}
+
+.pwa-voter-chip {
+  font-size: 0.68rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  opacity: 0.75;
+  white-space: nowrap;
+}
+
+.pwa-voter-chip--mine {
+  border-color: rgba(255, 200, 50, 0.35);
+  background: rgba(255, 200, 50, 0.1);
+  color: var(--sun);
+  opacity: 1;
+  font-weight: 600;
+}
+
+
+
 .resolver-row {
   display: flex;
   flex-wrap: wrap;

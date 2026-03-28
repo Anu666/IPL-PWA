@@ -44,7 +44,11 @@ const isSameIstDate = (isoLike: string, now: Date) => {
 function App() {
   const [isOffline, setIsOffline] = useState(!navigator.onLine)
   const [isLoading, setIsLoading] = useState(true)
-  const [activeScreen, setActiveScreen] = useState<AppScreen>('home')
+  const [activeScreen, setActiveScreen] = useState<AppScreen>(() => {
+    const saved = localStorage.getItem('pwa-screen')
+    const valid: AppScreen[] = ['home', 'matches', 'leaderboard', 'userDetails', 'historyHidden']
+    return (valid.includes(saved as AppScreen) ? saved : 'home') as AppScreen
+  })
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [matches, setMatches] = useState<Match[]>([])
   const [selectedMatchId, setSelectedMatchId] = useState<string | null>(null)
@@ -220,6 +224,10 @@ function App() {
       })
     }
   }
+
+  useEffect(() => {
+    localStorage.setItem('pwa-screen', activeScreen)
+  }, [activeScreen])
 
   useEffect(() => {
     const onOffline = () => setIsOffline(true)

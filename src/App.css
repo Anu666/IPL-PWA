@@ -1039,6 +1039,11 @@ body.menu-open {
   padding-bottom: 0.1rem;
 }
 
+/* ── Detail back button (mobile only) ───────────────────────────────────── */
+.detail-back-btn {
+  display: none;
+}
+
 @media (max-width: 900px) {
   .app-shell {
     padding: 0.85rem;
@@ -1047,6 +1052,29 @@ body.menu-open {
 
   .layout-grid {
     grid-template-columns: 1fr;
+  }
+
+  /* When a match detail is active on mobile, hide the list panel */
+  .layout-grid--detail > article:first-child {
+    display: none;
+  }
+
+  .detail-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: none;
+    border: none;
+    color: var(--accent, #60a5fa);
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 0 0 0.75rem 0;
+    cursor: pointer;
+    letter-spacing: 0.01em;
+  }
+
+  .detail-back-btn:hover {
+    opacity: 0.8;
   }
 
   .topbar {

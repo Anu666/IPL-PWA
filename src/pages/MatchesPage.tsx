@@ -53,6 +53,7 @@ export function MatchesPage({
   const [, setSecondTick] = useState(0)
   const [showStatsModal, setShowStatsModal] = useState(false)
   const [matchStatusRecord, setMatchStatusRecord] = useState<MatchStatusRecord | null>(null)
+  const [detailActive, setDetailActive] = useState(false)
   useEffect(() => {
     if (!selectedMatch) return
     const msToStart = new Date(selectedMatch.matchCommenceStartDate).getTime() - Date.now()
@@ -113,7 +114,7 @@ export function MatchesPage({
   }
 
   return (
-    <section className="layout-grid">
+    <section className={`layout-grid${detailActive && selectedMatch ? ' layout-grid--detail' : ''}`}>
       <article className="panel">
         <h2>Match List</h2>
         <p className="subtle">Each match has 5 questions, total 50 credits.</p>
@@ -158,7 +159,7 @@ export function MatchesPage({
                 key={match.id}
                 type="button"
                 className={isActive ? 'match-card active' : 'match-card'}
-                onClick={() => onSelectMatch(match.id)}
+                onClick={() => { onSelectMatch(match.id); setDetailActive(true) }}
               >
                 <div className="match-card-head">
                   <span>
@@ -179,6 +180,13 @@ export function MatchesPage({
       </article>
 
       <article className="panel">
+        <button
+          type="button"
+          className="detail-back-btn"
+          onClick={() => setDetailActive(false)}
+        >
+          ← Back to matches
+        </button>
         <h2>{selectedMatch ? selectedMatch.matchName : 'Select a match'}</h2>
         {selectedMatch ? (
           <p className="subtle">

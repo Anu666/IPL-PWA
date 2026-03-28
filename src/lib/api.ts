@@ -55,7 +55,7 @@ interface MatchStatusResponse {
 
 export const api = {
   matchStatuses: {
-    getAll: () => request<MatchStatusResponse[]>('/api/matchstatuses'),
+    getAll: () => request<MatchStatusResponse[]>('/api/matchstatus/GetAllMatchStatuses'),
   },
   users: {
     getMe: () => request<MeResponse>('/api/users/me'),

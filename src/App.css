@@ -971,6 +971,33 @@ body.menu-open {
   background: #ffffff06;
 }
 
+.lb-row--me {
+  background: rgba(234, 179, 8, 0.12);
+}
+
+.lb-row--me:hover {
+  background: rgba(234, 179, 8, 0.18);
+}
+
+/* Leaderboard table — center all columns except Name */
+.history-table--lb th,
+.history-table--lb td {
+  text-align: center;
+}
+
+.history-table--lb th:nth-child(2),
+.history-table--lb td:nth-child(2) {
+  text-align: left;
+}
+
+@media (max-width: 640px) {
+  .history-table--lb th,
+  .history-table--lb td {
+    padding: 0.45rem 0.35rem;
+    font-size: 0.72rem;
+  }
+}
+
 .pill {
   display: inline-flex;
   align-items: center;

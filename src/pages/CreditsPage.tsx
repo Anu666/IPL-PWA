@@ -10,7 +10,6 @@ import {
 } from '../lib/types'
 
 interface CreditsPageProps {
-  userId: string | null
   currentCredits: number
 }
 
@@ -61,18 +60,17 @@ function statusBadgeClass(status: TransactionStatus): string {
     : 'credits-badge credits-badge--pending'
 }
 
-export function CreditsPage({ userId, currentCredits }: CreditsPageProps) {
+export function CreditsPage({ currentCredits }: CreditsPageProps) {
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all')
 
   useEffect(() => {
-    if (!userId) return
     setLoading(true)
     setError(null)
     api.transactions
-      .getByUser(userId)
+      .getMyTransactions()
       .then((data) =>
         setTransactions(
           [...data].sort(
@@ -84,7 +82,7 @@ export function CreditsPage({ userId, currentCredits }: CreditsPageProps) {
         setError(e instanceof Error ? e.message : 'Failed to load transactions'),
       )
       .finally(() => setLoading(false))
-  }, [userId])
+  }, [])
 
   const filtered =
     typeFilter === 'all'

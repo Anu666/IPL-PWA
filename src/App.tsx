@@ -8,7 +8,7 @@ import { repository } from './lib/repository'
 import { isClosed } from './lib/time'
 import type {
   Answer,
-  LeaderboardRow,
+  LeaderboardEntry,
   Match,
   Question,
   UserHistoryEntry,
@@ -62,7 +62,7 @@ function App() {
   )
   const [userAnswerIds, setUserAnswerIds] = useState<Record<string, string>>({})
   const [history, setHistory] = useState<UserHistoryEntry[]>([])
-  const [leaderboardRows, setLeaderboardRows] = useState<LeaderboardRow[]>([])
+  const [leaderboardRows, setLeaderboardRows] = useState<LeaderboardEntry[]>([])
   const [currentCredits, setCurrentCredits] = useState(0)
   const [currentUser, setCurrentUser] = useState<ApiUser | null>(null)
   const [clockTick, setClockTick] = useState(0)
@@ -479,11 +479,11 @@ function App() {
       ) : null}
 
       {!isLoading && activeScreen === 'leaderboard' ? (
-        <LeaderboardPage rows={leaderboardRows} />
+        <LeaderboardPage rows={leaderboardRows} currentUserId={currentUser?.id ?? null} />
       ) : null}
 
       {!isLoading && activeScreen === 'credits' ? (
-        <CreditsPage userId={currentUser?.id ?? null} currentCredits={currentCredits} />
+        <CreditsPage currentCredits={currentCredits} />
       ) : null}
 
       {!isLoading && activeScreen === 'userDetails' ? (

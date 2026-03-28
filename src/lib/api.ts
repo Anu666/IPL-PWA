@@ -1,4 +1,4 @@
-import type { Answer, MatchStatusRecord, Question, Transaction, UserAnswer } from './types'
+import type { Answer, LeaderboardEntry, MatchStatusRecord, Question, Transaction, UserAnswer } from './types'
 
 // const BASE_URL = 'https://iplgaming20260322122951-axd9czg3bzewdeez.centralus-01.azurewebsites.net'
 const BASE_URL = 'https://localhost:44331'
@@ -71,8 +71,10 @@ export const api = {
       request<ApiQuestion[]>(`/api/questions/GetQuestionsByMatchId/${matchId}`),
   },
   transactions: {
-    getByUser: (userId: string) =>
-      request<Transaction[]>(`/api/transactions/GetTransactionsByUserId/${userId}`),
+    getMyTransactions: () => request<Transaction[]>('/api/transactions/GetMyTransactions'),
+  },
+  leaderboard: {
+    get: () => request<LeaderboardEntry[]>('/api/leaderboard/GetLeaderboard'),
   },
   userAnswers: {
     getByMatchAndUser: (matchId: string, userId: string) =>

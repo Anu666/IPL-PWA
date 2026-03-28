@@ -179,13 +179,16 @@ export interface UserAnswer {
   answers: Answer[]
 }
 
-export interface LeaderboardRow {
+export interface LeaderboardEntry {
   userId: string
   userName: string
-  currentCredits: number
-  wins: number
-  losses: number
-  penalized: number
+  totalCreditChange: number
+  correctPredictions: number
+  wrongPredictions: number
+  unansweredQuestions: number
+  voidedQuestions: number
+  matchesPlayed: number
+  winRate: number
   rank: number
 }
 

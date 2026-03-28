@@ -1,6 +1,6 @@
 import { api } from './api'
 import { getMappedMatches } from './mappers'
-import type { Answer, LeaderboardRow, Question, UserHistoryEntry } from './types'
+import type { Answer, LeaderboardEntry, Question, UserHistoryEntry } from './types'
 
 export const repository = {
   getMatches: async () => getMappedMatches(),
@@ -37,5 +37,11 @@ export const repository = {
 
   getUserHistory: async (_userId: string): Promise<UserHistoryEntry[]> => [],
 
-  getLeaderboard: async (): Promise<LeaderboardRow[]> => [],
+  getLeaderboard: async (): Promise<LeaderboardEntry[]> => {
+    try {
+      return await api.leaderboard.get()
+    } catch {
+      return []
+    }
+  },
 }

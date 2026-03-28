@@ -2,6 +2,7 @@ export type AppScreen =
   | 'home'
   | 'matches'
   | 'leaderboard'
+  | 'credits'
   | 'userDetails'
   | 'historyHidden'
 
@@ -15,6 +16,8 @@ interface SideMenuProps {
 const MENU_ITEMS: Array<{ key: Exclude<AppScreen, 'historyHidden'>; label: string }> = [
   { key: 'home', label: 'Home' },
   { key: 'matches', label: 'Matches' },
+  { key: 'leaderboard', label: 'Leaderboard' },
+  { key: 'credits', label: 'Credits' },
   { key: 'userDetails', label: 'User Details' },
 ]
 

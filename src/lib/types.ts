@@ -20,6 +20,34 @@ export const TransactionType = {
 } as const
 export type TransactionType = (typeof TransactionType)[keyof typeof TransactionType]
 
+export const TRANSACTION_TYPE_LABELS: Record<number, string> = {
+  0: 'Deposit',
+  1: 'Withdrawal',
+  2: 'Match Settlement',
+  3: 'Admin Override',
+}
+
+export const TransactionStatus = {
+  Pending:   0,
+  Completed: 1,
+} as const
+export type TransactionStatus = (typeof TransactionStatus)[keyof typeof TransactionStatus]
+
+export const TRANSACTION_STATUS_LABELS: Record<number, string> = {
+  0: 'Pending',
+  1: 'Completed',
+}
+
+export interface Transaction {
+  id: string
+  userId: string
+  matchId?: string | null
+  overallCreditChange: number
+  status: TransactionStatus
+  type: TransactionType
+  createdAt: string
+}
+
 export const MATCH_STATUS_LABELS: Record<number, string> = {
   0: 'Not Started',
   1: 'Ready for Picks',

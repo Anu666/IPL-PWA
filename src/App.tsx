@@ -17,6 +17,7 @@ import { MatchStatusValue } from './lib/types'
 import { HistoryPage } from './pages/HistoryPage'
 import { HomePage } from './pages/HomePage'
 import { LeaderboardPage } from './pages/LeaderboardPage'
+import { CreditsPage } from './pages/CreditsPage'
 import { MatchesPage, type MatchFilter } from './pages/MatchesPage'
 import { UserDetailsPage } from './pages/UserDetailsPage'
 
@@ -46,7 +47,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(true)
   const [activeScreen, setActiveScreen] = useState<AppScreen>(() => {
     const saved = localStorage.getItem('pwa-screen')
-    const valid: AppScreen[] = ['home', 'matches', 'leaderboard', 'userDetails', 'historyHidden']
+    const valid: AppScreen[] = ['home', 'matches', 'leaderboard', 'credits', 'userDetails', 'historyHidden']
     return (valid.includes(saved as AppScreen) ? saved : 'home') as AppScreen
   })
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -479,6 +480,10 @@ function App() {
 
       {!isLoading && activeScreen === 'leaderboard' ? (
         <LeaderboardPage rows={leaderboardRows} />
+      ) : null}
+
+      {!isLoading && activeScreen === 'credits' ? (
+        <CreditsPage userId={currentUser?.id ?? null} currentCredits={currentCredits} />
       ) : null}
 
       {!isLoading && activeScreen === 'userDetails' ? (

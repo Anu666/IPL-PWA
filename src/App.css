@@ -1540,4 +1540,167 @@ body.menu-open {
 .credit-pos { color: var(--mint); font-weight: 700; }
 .credit-neg { color: #ff8fa3;    font-weight: 700; }
 
+/* ── Credits page ────────────────────────────────────────────────────────── */
+.credits-page {
+  max-width: 760px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.credits-hero {
+  text-align: center;
+  padding: 1.75rem 1rem 1.5rem;
+  background: linear-gradient(135deg, #1a3a5c 0%, #2d1e3f 100%);
+  border: 1px solid #ffffff18;
+  border-radius: 1.2rem;
+  backdrop-filter: blur(8px);
+}
+
+.credits-hero-label {
+  margin: 0 0 0.25rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.6;
+}
+
+.credits-hero-amount {
+  margin: 0;
+  font-family: 'Bebas Neue', Impact, sans-serif;
+  font-size: clamp(3rem, 12vw, 5rem);
+  line-height: 1;
+  color: var(--sun);
+  letter-spacing: 0.04em;
+}
+
+.credits-hero-unit {
+  margin: 0.15rem 0 0;
+  font-size: 0.88rem;
+  opacity: 0.55;
+  text-transform: lowercase;
+  letter-spacing: 0.06em;
+}
+
+/* ── Type filter chips ───────────────────────────────────────────────────── */
+.credits-filters {
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.credits-chip {
+  border: 1px solid #ffffff22;
+  border-radius: 999px;
+  background: #ffffff0d;
+  color: var(--paper);
+  padding: 0.45rem 0.85rem;
+  min-height: 40px;
+  white-space: nowrap;
+  cursor: pointer;
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-size: 0.85rem;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.credits-chip:hover {
+  background: #ffffff16;
+}
+
+.credits-chip.active {
+  border-color: transparent;
+  background: linear-gradient(90deg, var(--teal), #3a86ff);
+  font-weight: 600;
+}
+
+/* ── Table panel ─────────────────────────────────────────────────────────── */
+.credits-table-panel {
+  margin: 0;
+}
+
+.credits-table-scroll {
+  overflow-x: auto;
+  border-radius: 0.75rem;
+  border: 1px solid #ffffff14;
+}
+
+.credits-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 420px;
+}
+
+.credits-table th {
+  padding: 0.55rem 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #ffffff18;
+  white-space: nowrap;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  opacity: 0.5;
+  font-weight: 700;
+  background: #ffffff08;
+}
+
+.credits-table td {
+  padding: 0.6rem 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #ffffff0a;
+  vertical-align: middle;
+  font-size: 0.88rem;
+}
+
+.credits-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.credits-table tbody tr:hover {
+  background: #ffffff06;
+}
+
+.credits-td-date {
+  font-size: 0.8rem;
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+.credits-td-match {
+  font-size: 0.82rem;
+  font-weight: 600;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+  opacity: 0.85;
+}
+
+.credits-td-amount {
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.credits-td-amount--positive { color: var(--mint); }
+.credits-td-amount--negative { color: #ff8fa3; }
+
+/* ── Badges ──────────────────────────────────────────────────────────────── */
+.credits-badge {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.credits-badge--deposit    { background: #7ad99522; border-color: #7ad99544; color: var(--mint); }
+.credits-badge--withdrawal { background: #ef476f22; border-color: #ef476f44; color: #ff8fa3; }
+.credits-badge--settlement { background: #219ebc22; border-color: #219ebc44; color: #6dd5ed; }
+.credits-badge--override   { background: #ffb70322; border-color: #ffb70344; color: var(--sun); }
+.credits-badge--completed  { background: #7ad99518; border-color: #7ad99530; color: var(--mint); }
+.credits-badge--pending    { background: #ffffff0a; border-color: #ffffff20; color: #ffffff66; }
+
+
 

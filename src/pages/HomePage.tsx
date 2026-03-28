@@ -13,7 +13,7 @@ const GROUP_LABELS: Record<GroupKey, string> = {
   completed: 'Completed',
 }
 
-const IN_PROGRESS_STATUSES = new Set([
+const IN_PROGRESS_STATUSES = new Set<number>([
   MatchStatusValue.PicksClosed,
   MatchStatusValue.BetsUpdated,
   MatchStatusValue.MatchCompleted,
@@ -23,7 +23,7 @@ const IN_PROGRESS_STATUSES = new Set([
 
 const getGroup = (status: number): GroupKey | null => {
   if (status === MatchStatusValue.ReadyForPicks) return 'ready'
-  if (IN_PROGRESS_STATUSES.has(status as typeof MatchStatusValue[keyof typeof MatchStatusValue])) return 'inProgress'
+  if (IN_PROGRESS_STATUSES.has(status)) return 'inProgress'
   if (status === MatchStatusValue.Done) return 'completed'
   return null
 }

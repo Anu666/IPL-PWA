@@ -12,6 +12,14 @@ export const MatchStatusValue = {
 } as const
 export type MatchStatusValue = (typeof MatchStatusValue)[keyof typeof MatchStatusValue]
 
+export const TransactionType = {
+  Deposit: 0,
+  Withdrawal: 1,
+  MatchSettlement: 2,
+  AdminOverride: 3,
+} as const
+export type TransactionType = (typeof TransactionType)[keyof typeof TransactionType]
+
 export const MATCH_STATUS_LABELS: Record<number, string> = {
   0: 'Not Started',
   1: 'Ready for Picks',

@@ -416,7 +416,7 @@ function App() {
   }
 
   return (
-    <main className="app-shell" key={clockTick}>
+    <main className="app-shell">
       <SideMenu
         isOpen={isMenuOpen}
         activeScreen={activeScreen}
@@ -446,6 +446,7 @@ function App() {
           questionSelections={questionSelections}
           saveErrors={saveErrors}
           matchStatuses={matchStatuses}
+          userId={currentUser?.id ?? null}
           onSelectMatch={setSelectedHomeMatchId}
           onSaveSelection={saveSelection}
         />
@@ -461,6 +462,7 @@ function App() {
           questionSelections={questionSelections}
           saveErrors={saveErrors}
           matchStatuses={matchStatuses}
+          userId={currentUser?.id ?? null}
           onFilterChange={setMatchFilter}
           onSelectMatch={setSelectedMatchId}
           onSaveSelection={saveSelection}

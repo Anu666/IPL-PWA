@@ -1,12 +1,14 @@
 export type PickStatus = 'open' | 'locked_pending' | 'won' | 'lost' | 'penalized'
 
 export const MatchStatusValue = {
-  NotStarted: 0,
-  ReadyForPicks: 1,
-  PicksClosed: 2,
-  BetsUpdated: 3,
-  MatchCompleted: 4,
-  BetsSettled: 5,
+  NotStarted:           0,
+  ReadyForPicks:        1,
+  PicksClosed:          2,
+  BetsUpdated:          3,
+  MatchCompleted:       4,
+  BetsSettled:          5,
+  TransactionsSettled:  6,
+  Done:                 7,
 } as const
 export type MatchStatusValue = (typeof MatchStatusValue)[keyof typeof MatchStatusValue]
 
@@ -17,12 +19,53 @@ export const MATCH_STATUS_LABELS: Record<number, string> = {
   3: 'Bets Updated',
   4: 'Match Completed',
   5: 'Bets Settled',
+  6: 'Transactions Settled',
+  7: 'Done',
+}
+
+export const OutcomeType = {
+  Won: 0,
+  Lost: 1,
+  AutoLost: 2,
+  Voided: 3,
+} as const
+export type OutcomeType = (typeof OutcomeType)[keyof typeof OutcomeType]
+
+export const OUTCOME_LABELS: Record<number, string> = {
+  0: 'Won',
+  1: 'Lost',
+  2: 'Auto-Lost',
+  3: 'Voided',
+}
+
+export interface QuestionFinalStats {
+  correctOptionId: number | null
+  winners: VoterInfo[]
+  losers: VoterInfo[]
+  autoLost: VoterInfo[]
+  isVoided: boolean
+  creditChangePerWinner: number
+  settledAt: string
+}
+
+export interface Change {
+  questionId: string
+  creditChange: number
+  outcome: OutcomeType
+}
+
+export interface MatchSummaryEntry {
+  userId: string
+  userName: string
+  overallCreditChange: number
+  changes: Change[]
 }
 
 export interface MatchStatusRecord {
   id: string
   matchId: string
   status: number
+  matchSummary?: MatchSummaryEntry[] | null
 }
 
 export interface Match {
@@ -84,11 +127,13 @@ export interface Question {
   correctOptionId: number | null
   closesAtIst: string
   bettingStats?: QuestionBettingStats | null
+  finalStats?: QuestionFinalStats | null
 }
 
 export interface Answer {
   questionId: string
   selectedOption: number
+  isCorrect?: boolean | null
 }
 
 export interface UserAnswer {

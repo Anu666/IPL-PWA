@@ -1,7 +1,22 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { countdownLabel, isClosed, toDisplayDate } from '../lib/time'
-import { MatchStatusValue, MATCH_STATUS_LABELS } from '../lib/types'
-import type { Match, Question } from '../lib/types'
+import { MatchStatusValue, MATCH_STATUS_LABELS, OutcomeType } from '../lib/types'
+import type { Match, MatchStatusRecord, Question } from '../lib/types'
+import { api } from '../lib/api'
+
+const OUTCOME_SHORT: Record<number, string> = {
+  [OutcomeType.Won]: 'W',
+  [OutcomeType.Lost]: 'L',
+  [OutcomeType.AutoLost]: 'AL',
+  [OutcomeType.Voided]: 'V',
+}
+
+const OUTCOME_CSS_CLASS: Record<number, string> = {
+  [OutcomeType.Won]: 'won',
+  [OutcomeType.Lost]: 'lost',
+  [OutcomeType.AutoLost]: 'autolost',
+  [OutcomeType.Voided]: 'voided',
+}
 
 export type MatchFilter = 'all' | 'active' | 'upcoming' | 'past'
 
@@ -14,6 +29,7 @@ interface MatchesPageProps {
   questionSelections: Record<string, number>
   saveErrors: Record<string, string>
   matchStatuses: Record<string, number>
+  userId: string | null
   onFilterChange: (nextFilter: MatchFilter) => void
   onSelectMatch: (matchId: string) => void
   onSaveSelection: (question: Question, selectedOptionId: number) => Promise<void>
@@ -28,6 +44,7 @@ export function MatchesPage({
   questionSelections,
   saveErrors,
   matchStatuses,
+  userId,
   onFilterChange,
   onSelectMatch,
   onSaveSelection,
@@ -35,6 +52,7 @@ export function MatchesPage({
   // 1-second tick when selected match is in its final 10 minutes (for instant lock flip)
   const [, setSecondTick] = useState(0)
   const [showStatsModal, setShowStatsModal] = useState(false)
+  const [matchStatusRecord, setMatchStatusRecord] = useState<MatchStatusRecord | null>(null)
   useEffect(() => {
     if (!selectedMatch) return
     const msToStart = new Date(selectedMatch.matchCommenceStartDate).getTime() - Date.now()
@@ -54,8 +72,45 @@ export function MatchesPage({
 
   const selectedEffectiveStatus = selectedMatch ? getEffectiveStatus(selectedMatch) : MatchStatusValue.NotStarted
   const picksOpen = selectedEffectiveStatus === MatchStatusValue.ReadyForPicks
-  const questionsVisible = selectedEffectiveStatus !== MatchStatusValue.NotStarted
-  const showBettingStats = selectedEffectiveStatus >= MatchStatusValue.BetsUpdated
+  const isMatchCompleted = selectedEffectiveStatus === MatchStatusValue.MatchCompleted
+  const isSettled = selectedEffectiveStatus >= MatchStatusValue.BetsSettled
+  const isTransactionsSettled = selectedEffectiveStatus >= MatchStatusValue.TransactionsSettled
+  const isDone = selectedEffectiveStatus === MatchStatusValue.Done
+  const questionsVisible = selectedEffectiveStatus !== MatchStatusValue.NotStarted && !isSettled
+  const showBettingStats = selectedEffectiveStatus >= MatchStatusValue.BetsUpdated && !isSettled
+
+  // Fetch full MatchStatusRecord (with matchSummary) when status is BetsSettled+
+  useEffect(() => {
+    if (!selectedMatch || !isSettled) {
+      setMatchStatusRecord(null)
+      return
+    }
+    api.matchStatuses.getByMatchId(selectedMatch.id)
+      .then(setMatchStatusRecord)
+      .catch(() => setMatchStatusRecord(null))
+  }, [selectedMatch?.id, isSettled])
+
+  const personalOutcome = useMemo(() => {
+    if (!matchStatusRecord?.matchSummary || !userId) return null
+    return matchStatusRecord.matchSummary.find((e) => e.userId === userId) ?? null
+  }, [matchStatusRecord, userId])
+
+  const rankedSummary = useMemo(() => {
+    if (!matchStatusRecord?.matchSummary) return []
+    return [...matchStatusRecord.matchSummary].sort((a, b) => b.overallCreditChange - a.overallCreditChange)
+  }, [matchStatusRecord])
+
+  const getQuestionOutcomeInfo = (question: Question, selectedOption: number | undefined) => {
+    const fs = question.finalStats
+    if (!fs) return null
+    if (fs.isVoided) return { label: 'Voided', cssClass: 'voided', deltaText: '±0 cr' }
+    if (selectedOption === undefined) return { label: 'Auto-Lost', cssClass: 'lost', deltaText: `−${question.credits} cr` }
+    if (selectedOption === fs.correctOptionId) {
+      const delta = fs.creditChangePerWinner > 0 ? `+${fs.creditChangePerWinner.toFixed(2)} cr` : '±0 cr (no bonus)'
+      return { label: 'Won', cssClass: 'won', deltaText: delta }
+    }
+    return { label: 'Lost', cssClass: 'lost', deltaText: `−${question.credits} cr` }
+  }
 
   return (
     <section className="layout-grid">
@@ -132,7 +187,119 @@ export function MatchesPage({
           </p>
         ) : null}
 
-        {selectedMatch && !picksOpen ? (
+        {/* ── MatchCompleted banner ──────────────────────────────────────── */}
+        {selectedMatch && isMatchCompleted && (
+          <div className="status-banner status-banner--match-completed">
+            🏁 Match completed — credits will be settled shortly
+          </div>
+        )}
+
+        {/* ── BetsSettled+ settlement view ──────────────────────────────── */}
+        {selectedMatch && isSettled && (
+          <div className="settlement-view">
+            {isDone ? (
+              <div className="status-banner status-banner--done">
+                🏆 This match has been successfully completed
+              </div>
+            ) : isTransactionsSettled ? (
+              <div className="status-banner status-banner--txn-settled">
+                ✅ Credits are now reflected in your account
+              </div>
+            ) : (
+              <div className="status-banner status-banner--bets-settled">
+                ✅ Bets settled — credits being processed
+              </div>
+            )}
+
+            {questions.length > 0 && (
+              <div className="outcome-section">
+                {personalOutcome !== null && (
+                  <div className={`outcome-total-card${personalOutcome.overallCreditChange >= 0 ? ' outcome-total-card--pos' : ' outcome-total-card--neg'}`}>
+                    <span className="outcome-total-label">Your result</span>
+                    <span className="outcome-total-value">
+                      {personalOutcome.overallCreditChange >= 0 ? '+' : ''}{personalOutcome.overallCreditChange.toFixed(2)} cr
+                    </span>
+                  </div>
+                )}
+
+                <div className="outcome-question-list">
+                  {questions.map((q) => {
+                    const selectedOption = questionSelections[q.id]
+                    const info = getQuestionOutcomeInfo(q, selectedOption)
+                    const correctOption = q.finalStats?.correctOptionId
+                    const correctLabel = correctOption !== undefined && correctOption !== null
+                      ? (q.options.find((o) => o.id === correctOption)?.optionText ?? '—')
+                      : '—'
+                    const myLabel = selectedOption !== undefined
+                      ? (q.options.find((o) => o.id === selectedOption)?.optionText ?? '—')
+                      : 'Not answered'
+                    return (
+                      <div key={q.id} className="outcome-question-row">
+                        <div className="outcome-q-text">{q.sequence}. {q.questionText}</div>
+                        <div className="outcome-q-meta">
+                          <span className="outcome-q-mypick">Your pick: {myLabel}</span>
+                          <span className="outcome-q-correct">Correct: {correctLabel}</span>
+                        </div>
+                        {info && (
+                          <div className="outcome-q-result">
+                            <span className={`outcome-chip outcome-chip--${info.cssClass}`}>{info.label}</span>
+                            <span className={`outcome-delta${info.cssClass === 'won' ? ' outcome-delta--pos' : info.cssClass === 'voided' ? '' : ' outcome-delta--neg'}`}>
+                              {info.deltaText}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
+            {rankedSummary.length > 0 && (
+              <div className="community-section">
+                <h4 className="community-title">Match Leaderboard</h4>
+                <div className="community-table-wrap">
+                  <table className="community-table">
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Net</th>
+                        {questions.map((q) => (
+                          <th key={q.id} title={q.questionText}>Q{q.sequence}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {rankedSummary.map((entry, idx) => (
+                        <tr key={entry.userId} className={entry.userId === userId ? 'community-row--me' : ''}>
+                          <td>{idx + 1}</td>
+                          <td className="community-name">{entry.userName}{entry.userId === userId ? ' (you)' : ''}</td>
+                          <td className={entry.overallCreditChange >= 0 ? 'credit-pos' : 'credit-neg'}>
+                            {entry.overallCreditChange >= 0 ? '+' : ''}{entry.overallCreditChange.toFixed(2)}
+                          </td>
+                          {questions.map((q) => {
+                            const change = entry.changes.find((c) => c.questionId === q.id)
+                            if (!change) return <td key={q.id}>—</td>
+                            return (
+                              <td key={q.id}>
+                                <span className={`community-chip community-chip--${OUTCOME_CSS_CLASS[change.outcome] ?? 'voided'}`}>
+                                  {OUTCOME_SHORT[change.outcome] ?? '?'}
+                                </span>
+                              </td>
+                            )
+                          })}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {selectedMatch && !picksOpen && !isSettled ? (
           <div className="picks-gated-notice">
             <span className={`match-status-chip match-status-chip--${selectedEffectiveStatus}`}>
               {MATCH_STATUS_LABELS[selectedEffectiveStatus]}

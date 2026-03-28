@@ -299,6 +299,9 @@ body.menu-open {
 .home-status-filter-chip--4.active { background: #7ad99522; border-color: var(--mint); color: var(--mint); }
 .home-status-filter-chip--5.active { background: #7ad99533; border-color: var(--mint); color: var(--mint); }
 
+/* Group chip active states */
+.home-group-chip.active { background: #ffb70322; border-color: var(--sun); color: var(--sun); }
+
 .home-status-filter-count {
   display: inline-flex;
   align-items: center;
@@ -1283,4 +1286,230 @@ body.menu-open {
 .gate-error-actions .gate-btn {
   flex: 1;
 }
+
+/* ── Status banners ──────────────────────────────────────────────────────── */
+.status-banner {
+  margin: 1.25rem 0 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.4;
+  border: 1px solid transparent;
+  text-align: center;
+}
+
+.status-banner--match-completed {
+  background: #ffd16620;
+  border-color: #ffd16660;
+  color: var(--sun);
+}
+
+.status-banner--bets-settled {
+  background: #7ad99520;
+  border-color: #7ad99560;
+  color: var(--mint);
+}
+
+.status-banner--txn-settled {
+  background: #06d6a020;
+  border-color: #06d6a060;
+  color: #06d6a0;
+}
+
+.status-banner--done {
+  background: #a78bfa20;
+  border-color: #a78bfa60;
+  color: #c4b5fd;
+}
+
+/* ── Settlement view ─────────────────────────────────────────────────────── */
+.settlement-view {
+  margin-top: 0.5rem;
+}
+
+/* ── Outcome section ─────────────────────────────────────────────────────── */
+.outcome-section {
+  margin-top: 1.25rem;
+}
+
+.outcome-total-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  border: 1px solid #ffffff22;
+  background: #ffffff0a;
+  margin-bottom: 1rem;
+}
+
+.outcome-total-card--pos {
+  background: #7ad99515;
+  border-color: #7ad99555;
+}
+
+.outcome-total-card--neg {
+  background: #ef476f15;
+  border-color: #ef476f55;
+}
+
+.outcome-total-label {
+  font-size: 0.85rem;
+  color: #ffffffaa;
+  font-weight: 500;
+}
+
+.outcome-total-value {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.outcome-total-card--pos .outcome-total-value { color: var(--mint); }
+.outcome-total-card--neg .outcome-total-value { color: #ff8fa3; }
+
+.outcome-question-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.outcome-question-row {
+  padding: 0.7rem 0.85rem;
+  border-radius: 8px;
+  background: #ffffff08;
+  border: 1px solid #ffffff12;
+}
+
+.outcome-q-text {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #ffffffdd;
+  margin-bottom: 0.4rem;
+  line-height: 1.35;
+}
+
+.outcome-q-meta {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.45rem;
+}
+
+.outcome-q-mypick,
+.outcome-q-correct {
+  font-size: 0.75rem;
+  color: #ffffff88;
+}
+
+.outcome-q-correct {
+  color: #a0d4b3;
+}
+
+.outcome-q-result {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.outcome-chip {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.outcome-chip--won   { background: #7ad99530; color: var(--mint); border: 1px solid #7ad99560; }
+.outcome-chip--lost  { background: #ef476f25; color: #ff8fa3;    border: 1px solid #ef476f55; }
+.outcome-chip--voided { background: #ffffff14; color: #ffffffaa;  border: 1px solid #ffffff30; }
+
+.outcome-delta { font-size: 0.8rem; font-weight: 600; }
+.outcome-delta--pos { color: var(--mint); }
+.outcome-delta--neg { color: #ff8fa3; }
+
+/* ── Community leaderboard ───────────────────────────────────────────────── */
+.community-section {
+  margin-top: 1.5rem;
+}
+
+.community-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ffffffcc;
+  margin: 0 0 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.community-table-wrap {
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1px solid #ffffff16;
+}
+
+.community-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  min-width: 340px;
+}
+
+.community-table th,
+.community-table td {
+  padding: 0.5rem 0.6rem;
+  text-align: center;
+  white-space: nowrap;
+  border-bottom: 1px solid #ffffff0d;
+}
+
+.community-table th {
+  background: #ffffff0d;
+  color: #ffffff77;
+  font-weight: 700;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.community-table td.community-name {
+  text-align: left;
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #ffffffdd;
+  font-weight: 500;
+}
+
+.community-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.community-row--me td {
+  background: #ffb70310;
+}
+
+.community-row--me td.community-name {
+  color: var(--sun);
+  font-weight: 700;
+}
+
+.community-chip {
+  display: inline-block;
+  padding: 0.15rem 0.35rem;
+  border-radius: 4px;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.community-chip--won     { background: #7ad99530; color: var(--mint); }
+.community-chip--lost    { background: #ef476f25; color: #ff8fa3; }
+.community-chip--autolost { background: #ef476f15; color: #ff8fa388; }
+.community-chip--voided  { background: #ffffff12; color: #ffffff66; }
+
+.credit-pos { color: var(--mint); font-weight: 700; }
+.credit-neg { color: #ff8fa3;    font-weight: 700; }
+
 

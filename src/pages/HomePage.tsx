@@ -1,16 +1,46 @@
 import { useEffect, useMemo, useState } from 'react'
 import { countdownLabel, isClosed, toDisplayDate } from '../lib/time'
-import { MatchStatusValue, MATCH_STATUS_LABELS } from '../lib/types'
-import type { Match, Question } from '../lib/types'
+import { MatchStatusValue, MATCH_STATUS_LABELS, OutcomeType } from '../lib/types'
+import type { Match, MatchStatusRecord, Question } from '../lib/types'
+import { api } from '../lib/api'
 
-// Statuses to show as filter chips (NotStarted excluded)
-const FILTER_STATUSES = [
-  MatchStatusValue.ReadyForPicks,
+// ── Group definitions ─────────────────────────────────────────────────────────
+type GroupKey = 'ready' | 'inProgress' | 'completed'
+
+const GROUP_LABELS: Record<GroupKey, string> = {
+  ready: 'Ready for Picks',
+  inProgress: 'In Progress',
+  completed: 'Completed',
+}
+
+const IN_PROGRESS_STATUSES = new Set([
   MatchStatusValue.PicksClosed,
   MatchStatusValue.BetsUpdated,
   MatchStatusValue.MatchCompleted,
   MatchStatusValue.BetsSettled,
-] as const
+  MatchStatusValue.TransactionsSettled,
+])
+
+const getGroup = (status: number): GroupKey | null => {
+  if (status === MatchStatusValue.ReadyForPicks) return 'ready'
+  if (IN_PROGRESS_STATUSES.has(status as typeof MatchStatusValue[keyof typeof MatchStatusValue])) return 'inProgress'
+  if (status === MatchStatusValue.Done) return 'completed'
+  return null
+}
+
+const OUTCOME_SHORT: Record<number, string> = {
+  [OutcomeType.Won]: 'W',
+  [OutcomeType.Lost]: 'L',
+  [OutcomeType.AutoLost]: 'AL',
+  [OutcomeType.Voided]: 'V',
+}
+
+const OUTCOME_CSS_CLASS: Record<number, string> = {
+  [OutcomeType.Won]: 'won',
+  [OutcomeType.Lost]: 'lost',
+  [OutcomeType.AutoLost]: 'autolost',
+  [OutcomeType.Voided]: 'voided',
+}
 
 interface HomePageProps {
   match: Match | null
@@ -20,15 +50,15 @@ interface HomePageProps {
   questionSelections: Record<string, number>
   saveErrors: Record<string, string>
   matchStatuses: Record<string, number>
+  userId: string | null
   onSelectMatch: (matchId: string) => void
   onSaveSelection: (question: Question, selectedOptionId: number) => Promise<void>
 }
 
-export function HomePage({ match, homeMatches, selectedHomeMatchId, questions, questionSelections, saveErrors, matchStatuses, onSelectMatch, onSaveSelection }: HomePageProps) {
+export function HomePage({ match, homeMatches, selectedHomeMatchId, questions, questionSelections, saveErrors, matchStatuses, userId, onSelectMatch, onSaveSelection }: HomePageProps) {
   const msToStart = match ? new Date(match.matchCommenceStartDate).getTime() - Date.now() : Infinity
   const isLastTenMin = msToStart > 0 && msToStart <= 10 * 60 * 1000
 
-  // 1-second local tick so seconds stay live in the final 10 minutes and lock flip is instant
   const [, setSecondTick] = useState(0)
   useEffect(() => {
     if (!isLastTenMin) return
@@ -36,39 +66,52 @@ export function HomePage({ match, homeMatches, selectedHomeMatchId, questions, q
     return () => clearInterval(id)
   }, [isLastTenMin])
 
-  // Build per-status counts from homeMatches
-  const statusCounts = useMemo(() => {
-    const counts: Partial<Record<number, number>> = {}
+  const [showStatsModal, setShowStatsModal] = useState(false)
+  const [selectedGroup, setSelectedGroup] = useState<GroupKey | null>(null)
+  const [matchStatusRecord, setMatchStatusRecord] = useState<MatchStatusRecord | null>(null)
+
+  // ── Per-match effective status helper ────────────────────────────────────────
+  const getEffectiveStatusForMatch = (m: Match): number => {
+    const s = matchStatuses[m.id] ?? MatchStatusValue.NotStarted
+    if (s === MatchStatusValue.ReadyForPicks && isClosed(m.matchCommenceStartDate)) {
+      return MatchStatusValue.PicksClosed
+    }
+    return s
+  }
+
+  // ── Group counts from visible home matches ────────────────────────────────────
+  const groupCounts = useMemo(() => {
+    const counts: Partial<Record<GroupKey, number>> = {}
     for (const m of homeMatches) {
-      const s = matchStatuses[m.id] ?? MatchStatusValue.NotStarted
-      if (s === MatchStatusValue.NotStarted) continue
-      counts[s] = (counts[s] ?? 0) + 1
+      const eff = getEffectiveStatusForMatch(m)
+      const g = getGroup(eff)
+      if (g) counts[g] = (counts[g] ?? 0) + 1
     }
     return counts
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [homeMatches, matchStatuses])
 
-  // Active statuses (those that have at least 1 match)
-  const activeStatuses = useMemo(
-    () => FILTER_STATUSES.filter((s) => (statusCounts[s] ?? 0) > 0),
-    [statusCounts],
-  )
+  const activeGroups = useMemo<GroupKey[]>(() => {
+    const all: GroupKey[] = ['ready', 'inProgress', 'completed']
+    return all.filter((g) => (groupCounts[g] ?? 0) > 0)
+  }, [groupCounts])
 
-  const [showStatsModal, setShowStatsModal] = useState(false)
-  const [selectedStatus, setSelectedStatus] = useState<number>(MatchStatusValue.ReadyForPicks)
-
-  // Keep selectedStatus in sync: if the current status has no matches, fall back to first active
+  // Keep selectedGroup in sync: prefer 'inProgress', fall back to first active group
   useEffect(() => {
-    if (activeStatuses.length === 0) return
-    if (!activeStatuses.includes(selectedStatus as typeof FILTER_STATUSES[number])) {
-      setSelectedStatus(activeStatuses[0])
+    if (activeGroups.length === 0) return
+    if (!selectedGroup || !activeGroups.includes(selectedGroup)) {
+      setSelectedGroup(activeGroups.includes('inProgress') ? 'inProgress' : activeGroups[0])
     }
-  }, [activeStatuses, selectedStatus])
+  }, [activeGroups, selectedGroup])
 
-  // Matches filtered by selected status
-  const visibleMatches = useMemo(
-    () => homeMatches.filter((m) => (matchStatuses[m.id] ?? MatchStatusValue.NotStarted) === selectedStatus),
-    [homeMatches, matchStatuses, selectedStatus],
-  )
+  // Matches for the selected group, sorted chronologically
+  const visibleMatches = useMemo(() => {
+    if (!selectedGroup) return []
+    return homeMatches
+      .filter((m) => getGroup(getEffectiveStatusForMatch(m)) === selectedGroup)
+      .sort((a, b) => new Date(a.matchCommenceStartDate).getTime() - new Date(b.matchCommenceStartDate).getTime())
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [homeMatches, matchStatuses, selectedGroup])
 
   // When visible matches change, ensure selectedHomeMatchId is in view
   useEffect(() => {
@@ -77,36 +120,77 @@ export function HomePage({ match, homeMatches, selectedHomeMatchId, questions, q
     }
   }, [visibleMatches, selectedHomeMatchId, onSelectMatch])
 
+  // Effective status for SELECTED match
   const apiStatus = match ? (matchStatuses[match.id] ?? MatchStatusValue.NotStarted) : MatchStatusValue.NotStarted
   const effectiveStatus =
     apiStatus === MatchStatusValue.ReadyForPicks && match && isClosed(match.matchCommenceStartDate)
       ? MatchStatusValue.PicksClosed
       : apiStatus
+
   const picksOpen = effectiveStatus === MatchStatusValue.ReadyForPicks
-  const questionsVisible = effectiveStatus !== MatchStatusValue.NotStarted
-  const showBettingStats = effectiveStatus >= MatchStatusValue.BetsUpdated
+  const isMatchCompleted = effectiveStatus === MatchStatusValue.MatchCompleted
+  const isSettled = effectiveStatus >= MatchStatusValue.BetsSettled
+  const isTransactionsSettled = effectiveStatus >= MatchStatusValue.TransactionsSettled
+  const isDone = effectiveStatus === MatchStatusValue.Done
+  const questionsVisible = effectiveStatus !== MatchStatusValue.NotStarted && !isSettled
+  const showBettingStats = effectiveStatus >= MatchStatusValue.BetsUpdated && !isSettled
+
+  // Fetch full MatchStatusRecord (with matchSummary) when status is BetsSettled+
+  useEffect(() => {
+    if (!match || !isSettled) {
+      setMatchStatusRecord(null)
+      return
+    }
+    api.matchStatuses.getByMatchId(match.id)
+      .then(setMatchStatusRecord)
+      .catch(() => setMatchStatusRecord(null))
+  }, [match?.id, isSettled])
+
+  // Personal outcome from matchSummary
+  const personalOutcome = useMemo(() => {
+    if (!matchStatusRecord?.matchSummary || !userId) return null
+    return matchStatusRecord.matchSummary.find((e) => e.userId === userId) ?? null
+  }, [matchStatusRecord, userId])
+
+  // Community leaderboard sorted by overallCreditChange DESC
+  const rankedSummary = useMemo(() => {
+    if (!matchStatusRecord?.matchSummary) return []
+    return [...matchStatusRecord.matchSummary].sort((a, b) => b.overallCreditChange - a.overallCreditChange)
+  }, [matchStatusRecord])
+
+  const getQuestionOutcomeInfo = (question: Question, selectedOption: number | undefined) => {
+    const fs = question.finalStats
+    if (!fs) return null
+    if (fs.isVoided) return { label: 'Voided', cssClass: 'voided', deltaText: '±0 cr' }
+    if (selectedOption === undefined) return { label: 'Auto-Lost', cssClass: 'lost', deltaText: `−${question.credits} cr` }
+    if (selectedOption === fs.correctOptionId) {
+      const delta = fs.creditChangePerWinner > 0 ? `+${fs.creditChangePerWinner.toFixed(2)} cr` : '±0 cr (no bonus)'
+      return { label: 'Won', cssClass: 'won', deltaText: delta }
+    }
+    return { label: 'Lost', cssClass: 'lost', deltaText: `−${question.credits} cr` }
+  }
 
   return (
     <div className="home-wrapper">
-      {/* Status filter chips — outside the panel */}
-      {activeStatuses.length > 0 && (
+      {/* Group filter chips — outside the panel */}
+      {activeGroups.length > 0 && (
         <div className="home-status-filters">
-          {activeStatuses.map((s) => (
+          {activeGroups.map((g) => (
             <button
-              key={s}
+              key={g}
               type="button"
-              className={`home-status-filter-chip home-status-filter-chip--${s}${selectedStatus === s ? ' active' : ''}`}
-              onClick={() => setSelectedStatus(s)}
+              className={`home-status-filter-chip home-group-chip${selectedGroup === g ? ' active' : ''}`}
+              onClick={() => setSelectedGroup(g)}
             >
-              {MATCH_STATUS_LABELS[s]}
-              <span className="home-status-filter-count">{statusCounts[s]}</span>
+              {GROUP_LABELS[g]}
+              <span className="home-status-filter-count">{groupCounts[g]}</span>
             </button>
           ))}
         </div>
       )}
 
       <section className="panel home-panel">
-        {/* Match switcher chips inside panel — only shown when multiple visible matches */}
+        {/* Match switcher chips — when multiple matches in group */}
         {visibleMatches.length > 1 && (
           <div className="home-match-chips">
             {visibleMatches.map((m) => (
@@ -140,7 +224,125 @@ export function HomePage({ match, homeMatches, selectedHomeMatchId, questions, q
               </p>
             </div>
 
-            {!picksOpen ? (
+            {/* ── MatchCompleted banner ─────────────────────────────────── */}
+            {isMatchCompleted && (
+              <div className="status-banner status-banner--match-completed">
+                🏁 Match completed — credits will be settled shortly
+              </div>
+            )}
+
+            {/* ── BetsSettled+ settlement view ──────────────────────────── */}
+            {isSettled && (
+              <div className="settlement-view">
+                {isDone ? (
+                  <div className="status-banner status-banner--done">
+                    🏆 This match has been successfully completed
+                  </div>
+                ) : isTransactionsSettled ? (
+                  <div className="status-banner status-banner--txn-settled">
+                    ✅ Credits are now reflected in your account
+                  </div>
+                ) : (
+                  <div className="status-banner status-banner--bets-settled">
+                    ✅ Bets settled — credits being processed
+                  </div>
+                )}
+
+                {/* Personal outcome */}
+                {questions.length > 0 && (
+                  <div className="outcome-section">
+                    {personalOutcome !== null && (
+                      <div className={`outcome-total-card${personalOutcome.overallCreditChange >= 0 ? ' outcome-total-card--pos' : ' outcome-total-card--neg'}`}>
+                        <span className="outcome-total-label">Your result</span>
+                        <span className="outcome-total-value">
+                          {personalOutcome.overallCreditChange >= 0 ? '+' : ''}{personalOutcome.overallCreditChange.toFixed(2)} cr
+                        </span>
+                      </div>
+                    )}
+
+                    <div className="outcome-question-list">
+                      {questions.map((q) => {
+                        const selectedOption = questionSelections[q.id]
+                        const info = getQuestionOutcomeInfo(q, selectedOption)
+                        const correctOption = q.finalStats?.correctOptionId
+                        const correctLabel = correctOption !== undefined && correctOption !== null
+                          ? (q.options.find((o) => o.id === correctOption)?.optionText ?? '—')
+                          : '—'
+                        const myLabel = selectedOption !== undefined
+                          ? (q.options.find((o) => o.id === selectedOption)?.optionText ?? '—')
+                          : 'Not answered'
+                        return (
+                          <div key={q.id} className="outcome-question-row">
+                            <div className="outcome-q-text">{q.sequence}. {q.questionText}</div>
+                            <div className="outcome-q-meta">
+                              <span className="outcome-q-mypick">Your pick: {myLabel}</span>
+                              <span className="outcome-q-correct">Correct: {correctLabel}</span>
+                            </div>
+                            {info && (
+                              <div className="outcome-q-result">
+                                <span className={`outcome-chip outcome-chip--${info.cssClass}`}>{info.label}</span>
+                                <span className={`outcome-delta${info.cssClass === 'won' ? ' outcome-delta--pos' : info.cssClass === 'voided' ? '' : ' outcome-delta--neg'}`}>
+                                  {info.deltaText}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Match leaderboard */}
+                {rankedSummary.length > 0 && (
+                  <div className="community-section">
+                    <h4 className="community-title">Match Leaderboard</h4>
+                    <div className="community-table-wrap">
+                      <table className="community-table">
+                        <thead>
+                          <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Net</th>
+                            {questions.map((q) => (
+                              <th key={q.id} title={q.questionText}>Q{q.sequence}</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {rankedSummary.map((entry, idx) => (
+                            <tr
+                              key={entry.userId}
+                              className={entry.userId === userId ? 'community-row--me' : ''}
+                            >
+                              <td>{idx + 1}</td>
+                              <td className="community-name">{entry.userName}{entry.userId === userId ? ' (you)' : ''}</td>
+                              <td className={entry.overallCreditChange >= 0 ? 'credit-pos' : 'credit-neg'}>
+                                {entry.overallCreditChange >= 0 ? '+' : ''}{entry.overallCreditChange.toFixed(2)}
+                              </td>
+                              {questions.map((q) => {
+                                const change = entry.changes.find((c) => c.questionId === q.id)
+                                if (!change) return <td key={q.id}>—</td>
+                                return (
+                                  <td key={q.id}>
+                                    <span className={`community-chip community-chip--${OUTCOME_CSS_CLASS[change.outcome] ?? 'voided'}`}>
+                                      {OUTCOME_SHORT[change.outcome] ?? '?'}
+                                    </span>
+                                  </td>
+                                )
+                              })}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ── Regular question notice for locked statuses ───────────── */}
+            {!picksOpen && !isSettled && (
               <div className="picks-gated-notice" style={{ marginTop: '1.5rem' }}>
                 <span className={`match-status-chip match-status-chip--${effectiveStatus}`}>
                   {MATCH_STATUS_LABELS[effectiveStatus]}
@@ -151,7 +353,7 @@ export function HomePage({ match, homeMatches, selectedHomeMatchId, questions, q
                     : 'Picks are closed — your selections are shown below.'}
                 </p>
               </div>
-            ) : null}
+            )}
 
             {questionsVisible && questions.length === 0 ? (
               <p className="subtle" style={{ marginTop: '1.5rem', textAlign: 'center' }}>
@@ -164,6 +366,7 @@ export function HomePage({ match, homeMatches, selectedHomeMatchId, questions, q
                 📊 View Betting Stats
               </button>
             ) : null}
+
             {questionsVisible && questions.length > 0 ? (
               <div className="question-list">
                 {questions.map((question) => {
@@ -197,7 +400,6 @@ export function HomePage({ match, homeMatches, selectedHomeMatchId, questions, q
                         <p className="save-error">{saveErrors[question.id]}</p>
                       ) : null}
 
-                      {/* Inline personal outcome — visible when BetsUpdated or beyond */}
                       {showBettingStats && question.bettingStats ? (() => {
                         const stats = question.bettingStats!
                         const allOtherOptionsUnvoted = selectedOption !== undefined &&
@@ -326,4 +528,3 @@ export function HomePage({ match, homeMatches, selectedHomeMatchId, questions, q
     </div>
   )
 }
-

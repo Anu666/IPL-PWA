@@ -246,7 +246,7 @@ export function MatchesPage({
                         <div className="outcome-q-text">{q.sequence}. {q.questionText}</div>
                         <div className="outcome-q-meta">
                           <span className="outcome-q-mypick">Your pick: {myLabel}</span>
-                          <span className="outcome-q-correct">Correct: {correctLabel}</span>
+                          <span className="outcome-q-correct">Correct pick: {correctLabel}</span>
                         </div>
                         {info && (
                           <div className="outcome-q-result">

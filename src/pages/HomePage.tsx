@@ -279,7 +279,7 @@ export function HomePage({ match, homeMatches, selectedHomeMatchId, questions, q
                             </div>
                             <div className="outcome-q-meta">
                               <span className="outcome-q-mypick">Your pick: {myLabel}</span>
-                              <span className="outcome-q-correct">Correct: {correctLabel}</span>
+                              <span className="outcome-q-correct">Correct pick: {correctLabel}</span>
                             </div>
                             {info && (
                               <div className="outcome-q-result">

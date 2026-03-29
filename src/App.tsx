@@ -150,21 +150,22 @@ function App() {
     setCurrentUser(apiUser)
     setCurrentCredits(apiUser.credits)
 
-    const allMatches = await repository.getMatches()
+    // Fetch matches and statuses in parallel so homeMatchPool is computed
+    // once with complete data — no intermediate state with stale questions.
+    const [allMatches, allStatuses] = await Promise.all([
+      repository.getMatches(),
+      api.matchStatuses.getAll().catch(() => [] as { matchId: string; status: number }[]),
+    ])
+
     const firstMatchId = allMatches[0]?.id ?? null
+    const statusMap: Record<string, number> = {}
+    for (const s of allStatuses) { statusMap[s.matchId] = s.status }
 
+    // Both set synchronously — React 18 batches these into one render,
+    // so homeMatchPool is computed with full statuses on first evaluation.
     setMatches(allMatches)
+    setMatchStatuses(statusMap)
     setSelectedMatchId((prev) => prev ?? firstMatchId)
-    setSelectedHomeMatchId((prev) => prev ?? firstMatchId)
-
-    try {
-      const allStatuses = await api.matchStatuses.getAll()
-      const statusMap: Record<string, number> = {}
-      for (const s of allStatuses) { statusMap[s.matchId] = s.status }
-      setMatchStatuses(statusMap)
-    } catch {
-      // statuses are non-critical; silently ignore failures
-    }
 
     const nextHistory = await repository.getUserHistory(apiUser.id)
     const nextLeaderboard = await repository.getLeaderboard()

@@ -729,11 +729,19 @@ body.menu-open {
 }
 
 .pwa-bar-fill--1 {
-  background: linear-gradient(90deg, var(--teal), #3a86ff);
+  background: linear-gradient(90deg, #3a86ff, #219ebc);
 }
 
 .pwa-bar-fill--2 {
-  background: linear-gradient(90deg, var(--sun), var(--flame));
+  background: linear-gradient(90deg, #a855f7, #7c3aed);
+}
+
+.pwa-bar-fill--3 {
+  background: linear-gradient(90deg, #22c55e, #7ad995);
+}
+
+.pwa-bar-fill--4 {
+  background: linear-gradient(90deg, #f97316, #ef4444);
 }
 
 /* ── Inline personal outcome line ──────────────────────── */
@@ -1440,8 +1448,15 @@ body.menu-open {
   font-size: 0.85rem;
   font-weight: 600;
   color: #ffffffdd;
-  margin-bottom: 0.4rem;
   line-height: 1.35;
+}
+
+.outcome-q-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
 }
 
 .outcome-q-meta {
@@ -1484,6 +1499,38 @@ body.menu-open {
 .outcome-delta { font-size: 0.8rem; font-weight: 600; }
 .outcome-delta--pos { color: var(--mint); }
 .outcome-delta--neg { color: #ff8fa3; }
+
+.outcome-q-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 0.65rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.outcome-q-stat-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.18rem;
+}
+
+.outcome-q-stat-row--mine .outcome-q-stat-label {
+  font-weight: 700;
+  color: #ffffffee;
+}
+
+.outcome-q-stat-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.74rem;
+  color: #ffffff99;
+}
+
+.outcome-q-stat-count {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.7;
+}
 
 /* ── Community leaderboard ───────────────────────────────────────────────── */
 .community-section {

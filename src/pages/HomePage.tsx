@@ -273,7 +273,10 @@ export function HomePage({ match, homeMatches, selectedHomeMatchId, questions, q
                           : 'Not answered'
                         return (
                           <div key={q.id} className="outcome-question-row">
-                            <div className="outcome-q-text">{q.sequence}. {q.questionText}</div>
+                            <div className="outcome-q-header">
+                              <div className="outcome-q-text">{q.sequence}. {q.questionText}</div>
+                              <span className="question-credits">{q.credits} cr</span>
+                            </div>
                             <div className="outcome-q-meta">
                               <span className="outcome-q-mypick">Your pick: {myLabel}</span>
                               <span className="outcome-q-correct">Correct: {correctLabel}</span>
@@ -337,6 +340,13 @@ export function HomePage({ match, homeMatches, selectedHomeMatchId, questions, q
                       </table>
                     </div>
                   </div>
+                )}
+
+                {/* Betting stats button in settled view */}
+                {questions.some((q) => q.bettingStats) && (
+                  <button type="button" className="pwa-stats-btn" style={{ marginTop: '1rem' }} onClick={() => setShowStatsModal(true)}>
+                    📊 View Betting Stats
+                  </button>
                 )}
               </div>
             )}

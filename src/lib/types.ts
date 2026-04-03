@@ -9,6 +9,7 @@ export const MatchStatusValue = {
   BetsSettled:          5,
   TransactionsSettled:  6,
   Done:                 7,
+  Archived:             8,
 } as const
 export type MatchStatusValue = (typeof MatchStatusValue)[keyof typeof MatchStatusValue]
 
@@ -57,6 +58,7 @@ export const MATCH_STATUS_LABELS: Record<number, string> = {
   5: 'Bets Settled',
   6: 'Transactions Settled',
   7: 'Done',
+  8: 'Past',
 }
 
 export const OutcomeType = {

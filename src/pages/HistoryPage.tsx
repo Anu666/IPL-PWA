@@ -28,7 +28,7 @@ export function HistoryPage({ history }: HistoryPageProps) {
                 <td>
                   <span className={`pill ${item.status}`}>{item.status}</span>
                 </td>
-                <td>{item.deltaCredits > 0 ? `+${item.deltaCredits}` : item.deltaCredits}</td>
+                <td>{item.deltaCredits > 0 ? `+${item.deltaCredits.toFixed(2)}` : item.deltaCredits.toFixed(2)}</td>
               </tr>
             ))}
           </tbody>

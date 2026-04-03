@@ -26,7 +26,7 @@ export function TopBar({
           <div className="credit-pill">
             <div className="credit-pill-text">
               <span>{currentUser.name}</span>
-              <strong style={{ color: 'var(--sun)' }}>{currentCredits} credits</strong>
+              <strong style={{ color: 'var(--sun)' }}>{currentCredits.toFixed(2)} credits</strong>
             </div>
             <button
               type="button"

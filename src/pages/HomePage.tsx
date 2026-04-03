@@ -105,11 +105,18 @@ export function HomePage({ match, homeMatches, selectedHomeMatchId, questions, q
   }, [activeGroups, selectedGroup])
 
   // Matches for the selected group, sorted chronologically
+  // For 'completed' group: most recent first; for others: oldest first
   const visibleMatches = useMemo(() => {
     if (!selectedGroup) return []
-    return homeMatches
-      .filter((m) => getGroup(getEffectiveStatusForMatch(m)) === selectedGroup)
-      .sort((a, b) => new Date(a.matchCommenceStartDate).getTime() - new Date(b.matchCommenceStartDate).getTime())
+    const filtered = homeMatches.filter((m) => getGroup(getEffectiveStatusForMatch(m)) === selectedGroup)
+    
+    if (selectedGroup === 'completed') {
+      // Sort by date descending (most recent first)
+      return filtered.sort((a, b) => new Date(b.matchCommenceStartDate).getTime() - new Date(a.matchCommenceStartDate).getTime())
+    } else {
+      // Sort by date ascending (oldest first)
+      return filtered.sort((a, b) => new Date(a.matchCommenceStartDate).getTime() - new Date(b.matchCommenceStartDate).getTime())
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [homeMatches, matchStatuses, selectedGroup])
 
@@ -162,12 +169,12 @@ export function HomePage({ match, homeMatches, selectedHomeMatchId, questions, q
     const fs = question.finalStats
     if (!fs) return null
     if (fs.isVoided) return { label: 'Voided', cssClass: 'voided', deltaText: '±0 cr' }
-    if (selectedOption === undefined) return { label: 'Auto-Lost', cssClass: 'lost', deltaText: `−${question.credits} cr` }
+    if (selectedOption === undefined) return { label: 'Auto-Lost', cssClass: 'lost', deltaText: `−${question.credits.toFixed(2)} cr` }
     if (selectedOption === fs.correctOptionId) {
       const delta = fs.creditChangePerWinner > 0 ? `+${fs.creditChangePerWinner.toFixed(2)} cr` : '±0 cr (no bonus)'
       return { label: 'Won', cssClass: 'won', deltaText: delta }
     }
-    return { label: 'Lost', cssClass: 'lost', deltaText: `−${question.credits} cr` }
+    return { label: 'Lost', cssClass: 'lost', deltaText: `−${question.credits.toFixed(2)} cr` }
   }
 
   return (
@@ -275,7 +282,7 @@ export function HomePage({ match, homeMatches, selectedHomeMatchId, questions, q
                           <div key={q.id} className="outcome-question-row">
                             <div className="outcome-q-header">
                               <div className="outcome-q-text">{q.sequence}. {q.questionText}</div>
-                              <span className="question-credits">{q.credits} cr</span>
+                              <span className="question-credits">{q.credits.toFixed(2)} cr</span>
                             </div>
                             <div className="outcome-q-meta">
                               <span className="outcome-q-mypick">Your pick: {myLabel}</span>
@@ -386,7 +393,7 @@ export function HomePage({ match, homeMatches, selectedHomeMatchId, questions, q
                     <div className="question-card" key={question.id}>
                       <div className="question-head">
                         <div className="question-head-top">
-                          <span className="question-credits">{question.credits} credits</span>
+                          <span className="question-credits">{question.credits.toFixed(2)} credits</span>
                           <span className={locked ? 'lock-note locked' : 'lock-note open'}>
                             {locked ? '🔒 Locked' : '✓ Open'}
                           </span>
@@ -426,7 +433,7 @@ export function HomePage({ match, homeMatches, selectedHomeMatchId, questions, q
                           return (
                             <div className="pwa-outcome-line">
                               <span className="pwa-outcome-wrong">
-                                Not answered · {allOptionsHaveVoters ? `−${question.credits} cr auto-loss` : `May lose −${question.credits} cr`}
+                                Not answered · {allOptionsHaveVoters ? `−${question.credits.toFixed(2)} cr auto-loss` : `May lose −${question.credits.toFixed(2)} cr`}
                               </span>
                             </div>
                           )
@@ -444,7 +451,7 @@ export function HomePage({ match, homeMatches, selectedHomeMatchId, questions, q
                             {allOtherOptionsUnvoted ? (
                               <span className="pwa-outcome-nobonus">If wrong: No loss</span>
                             ) : (
-                              <span className="pwa-outcome-wrong">If wrong: −{question.credits} cr</span>
+                              <span className="pwa-outcome-wrong">If wrong: −{question.credits.toFixed(2)} cr</span>
                             )}
                           </div>
                         )

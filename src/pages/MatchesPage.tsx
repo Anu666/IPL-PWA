@@ -105,12 +105,12 @@ export function MatchesPage({
     const fs = question.finalStats
     if (!fs) return null
     if (fs.isVoided) return { label: 'Voided', cssClass: 'voided', deltaText: '±0 cr' }
-    if (selectedOption === undefined) return { label: 'Auto-Lost', cssClass: 'lost', deltaText: `−${question.credits} cr` }
+    if (selectedOption === undefined) return { label: 'Auto-Lost', cssClass: 'lost', deltaText: `−${question.credits.toFixed(2)} cr` }
     if (selectedOption === fs.correctOptionId) {
       const delta = fs.creditChangePerWinner > 0 ? `+${fs.creditChangePerWinner.toFixed(2)} cr` : '±0 cr (no bonus)'
       return { label: 'Won', cssClass: 'won', deltaText: delta }
     }
-    return { label: 'Lost', cssClass: 'lost', deltaText: `−${question.credits} cr` }
+    return { label: 'Lost', cssClass: 'lost', deltaText: `−${question.credits.toFixed(2)} cr` }
   }
 
   return (

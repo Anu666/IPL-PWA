@@ -37,7 +37,7 @@ export function UserDetailsPage({
           <h3 className="user-section-title">Credits</h3>
           <div className="user-stat-card">
             <p className="subtle">Current Credits</p>
-            <strong style={{ fontSize: '1.5rem', color: 'var(--sun)' }}>{currentCredits}</strong>
+            <strong style={{ fontSize: '1.5rem', color: 'var(--sun)' }}>{currentCredits.toFixed(2)}</strong>
           </div>
 
 

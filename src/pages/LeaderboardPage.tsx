@@ -42,7 +42,7 @@ export function LeaderboardPage({ rows, currentUserId }: LeaderboardPageProps) {
                   <td>#{row.rank}</td>
                   <td>{isMe ? <strong>{row.userName}</strong> : row.userName}</td>
                   <td style={{ color: row.totalCreditChange >= 0 ? 'var(--color-win, #22c55e)' : 'var(--color-loss, #ef4444)', fontWeight: 600 }}>
-                    {pnlSign}{row.totalCreditChange}
+                    {pnlSign}{row.totalCreditChange.toFixed(2)}
                   </td>
                   <td>{row.correctPredictions}</td>
                   <td>{row.wrongPredictions}</td>

@@ -553,6 +553,16 @@ body.menu-open {
   font-family: 'Space Grotesk', system-ui, sans-serif;
   font-size: 0.9rem;
   transition: background 0.15s, border-color 0.15s;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+/* Force single column on mobile for better text wrapping */
+@media (max-width: 640px) {
+  .option-list {
+    grid-template-columns: 1fr !important;
+  }
 }
 
 .option-btn:hover:not(:disabled) {
@@ -742,6 +752,30 @@ body.menu-open {
 
 .pwa-bar-fill--4 {
   background: linear-gradient(90deg, #f97316, #ef4444);
+}
+
+.pwa-bar-fill--5 {
+  background: linear-gradient(90deg, #ec4899, #f43f5e);
+}
+
+.pwa-bar-fill--6 {
+  background: linear-gradient(90deg, #facc15, #fbbf24);
+}
+
+.pwa-bar-fill--7 {
+  background: linear-gradient(90deg, #06b6d4, #0ea5e9);
+}
+
+.pwa-bar-fill--8 {
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+}
+
+.pwa-bar-fill--9 {
+  background: linear-gradient(90deg, #84cc16, #65a30d);
+}
+
+.pwa-bar-fill--10 {
+  background: linear-gradient(90deg, #fb923c, #f97316);
 }
 
 /* ── Inline personal outcome line ──────────────────────── */

@@ -400,7 +400,14 @@ export function HomePage({ match, homeMatches, selectedHomeMatchId, questions, q
                         </div>
                         <h3>{question.sequence}. {question.questionText}</h3>
                       </div>
-                      <div className="option-list">
+                      <div 
+                        className="option-list" 
+                        style={{
+                          gridTemplateColumns: question.options.length > 3 
+                            ? 'repeat(2, 1fr)' 
+                            : '1fr'
+                        }}
+                      >
                         {question.options.map((option) => (
                           <button
                             key={option.id}
@@ -440,6 +447,7 @@ export function HomePage({ match, homeMatches, selectedHomeMatchId, questions, q
                         }
                         const myOptionStat = stats.optionStats.find((os) => os.optionId === selectedOption)
                         const bonus = myOptionStat?.potentialWinCredits ?? 0
+                        const hasUnvotedOptions = stats.optionStats.some((os) => os.voteCount === 0)
                         return (
                           <div className="pwa-outcome-line">
                             {bonus > 0 ? (
@@ -450,6 +458,8 @@ export function HomePage({ match, homeMatches, selectedHomeMatchId, questions, q
                             <span className="pwa-outcome-sep">·</span>
                             {allOtherOptionsUnvoted ? (
                               <span className="pwa-outcome-nobonus">If wrong: No loss</span>
+                            ) : hasUnvotedOptions ? (
+                              <span className="pwa-outcome-wrong">If wrong: May lose −{question.credits.toFixed(2)} cr</span>
                             ) : (
                               <span className="pwa-outcome-wrong">If wrong: −{question.credits.toFixed(2)} cr</span>
                             )}

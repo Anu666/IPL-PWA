@@ -104,6 +104,7 @@ export interface MatchStatusRecord {
   matchId: string
   status: number
   matchCommenceStartDate?: string | null
+  isDelayed?: boolean | null
   matchSummary?: MatchSummaryEntry[] | null
 }
 

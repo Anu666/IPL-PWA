@@ -49,7 +49,7 @@ interface HomePageProps {
   questions: Question[]
   questionSelections: Record<string, number>
   saveErrors: Record<string, string>
-  matchStatuses: Record<string, { status: number; matchCommenceStartDate?: string | null }>
+  matchStatuses: Record<string, { status: number; matchCommenceStartDate?: string | null; isDelayed?: boolean | null }>
   userId: string | null
   onSelectMatch: (matchId: string) => void
   onSaveSelection: (question: Question, selectedOptionId: number) => Promise<void>
@@ -77,6 +77,8 @@ export function HomePage({ match, homeMatches, selectedHomeMatchId, questions, q
   const getEffectiveStatusForMatch = (m: Match): number => {
     const entry = matchStatuses[m.id]
     const s = entry?.status ?? MatchStatusValue.NotStarted
+    // When delayed, keep ReadyForPicks open even after start time passes
+    if (s === MatchStatusValue.ReadyForPicks && entry?.isDelayed) return MatchStatusValue.ReadyForPicks
     const startDate = entry?.matchCommenceStartDate ?? m.matchCommenceStartDate
     if (s === MatchStatusValue.ReadyForPicks && isClosed(startDate)) {
       return MatchStatusValue.PicksClosed
@@ -134,8 +136,11 @@ export function HomePage({ match, homeMatches, selectedHomeMatchId, questions, q
 
   // Effective status for SELECTED match
   const apiStatus = match ? (matchStatuses[match.id]?.status ?? MatchStatusValue.NotStarted) : MatchStatusValue.NotStarted
+  const isDelayed = match ? !!(matchStatuses[match.id]?.isDelayed) : false
   const effectiveStatus =
-    apiStatus === MatchStatusValue.ReadyForPicks && match && isClosed(effectiveMatchStartDate)
+    apiStatus === MatchStatusValue.ReadyForPicks && isDelayed
+      ? MatchStatusValue.ReadyForPicks
+      : apiStatus === MatchStatusValue.ReadyForPicks && match && isClosed(effectiveMatchStartDate)
       ? MatchStatusValue.PicksClosed
       : apiStatus
 
@@ -232,9 +237,19 @@ export function HomePage({ match, homeMatches, selectedHomeMatchId, questions, q
               <p className="subtle">{match.groundName}, {match.city}</p>
               <p className="subtle">
                 {toDisplayDate(effectiveMatchStartDate)}&ensp;·&ensp;
-                <strong style={{ color: 'var(--sun)' }}>{countdownLabel(effectiveMatchStartDate)}</strong>
+                {isDelayed
+                  ? <strong style={{ color: '#f59e0b' }}>⏸ Delayed</strong>
+                  : <strong style={{ color: 'var(--sun)' }}>{countdownLabel(effectiveMatchStartDate)}</strong>
+                }
               </p>
             </div>
+
+            {/* ── Delayed banner ───────────────────────────────────────── */}
+            {isDelayed && picksOpen && (
+              <div className="status-banner" style={{ background: '#f59e0b22', borderColor: '#f59e0b66', color: '#f59e0b' }}>
+                ⏸ This match has been delayed. Picks are still open — you can update your selections.
+              </div>
+            )}
 
             {/* ── MatchCompleted banner ─────────────────────────────────── */}
             {isMatchCompleted && (

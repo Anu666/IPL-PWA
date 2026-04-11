@@ -66,7 +66,7 @@ function App() {
   const [currentCredits, setCurrentCredits] = useState(0)
   const [currentUser, setCurrentUser] = useState<ApiUser | null>(null)
   const [clockTick, setClockTick] = useState(0)
-  const [matchStatuses, setMatchStatuses] = useState<Record<string, { status: number; matchCommenceStartDate?: string | null }>>({})   
+  const [matchStatuses, setMatchStatuses] = useState<Record<string, { status: number; matchCommenceStartDate?: string | null; isDelayed?: boolean | null }>>({})   
   // Per-question save error: questionId -> error message
   const [saveErrors, setSaveErrors] = useState<Record<string, string>>({})
   // Tracks match IDs that currently have a save in-flight to prevent concurrent requests
@@ -158,8 +158,8 @@ function App() {
     ])
 
     const firstMatchId = allMatches[0]?.id ?? null
-    const statusMap: Record<string, { status: number; matchCommenceStartDate?: string | null }> = {}
-    for (const s of allStatuses) { statusMap[s.matchId] = { status: s.status, matchCommenceStartDate: s.matchCommenceStartDate } }
+    const statusMap: Record<string, { status: number; matchCommenceStartDate?: string | null; isDelayed?: boolean | null }> = {}
+    for (const s of allStatuses) { statusMap[s.matchId] = { status: s.status, matchCommenceStartDate: s.matchCommenceStartDate, isDelayed: s.isDelayed } }
 
     // Both set synchronously — React 18 batches these into one render,
     // so homeMatchPool is computed with full statuses on first evaluation.

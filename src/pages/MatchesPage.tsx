@@ -28,7 +28,7 @@ interface MatchesPageProps {
   activeFilter: MatchFilter
   questionSelections: Record<string, number>
   saveErrors: Record<string, string>
-  matchStatuses: Record<string, { status: number; matchCommenceStartDate?: string | null }>
+  matchStatuses: Record<string, { status: number; matchCommenceStartDate?: string | null; isDelayed?: boolean | null }>
   userId: string | null
   onFilterChange: (nextFilter: MatchFilter) => void
   onSelectMatch: (matchId: string) => void
@@ -67,6 +67,8 @@ export function MatchesPage({
   const getEffectiveStatus = (match: Match): number => {
     const entry = matchStatuses[match.id]
     const apiStatus = entry?.status ?? MatchStatusValue.NotStarted
+    // When delayed, keep ReadyForPicks even after start time passes
+    if (apiStatus === MatchStatusValue.ReadyForPicks && entry?.isDelayed) return MatchStatusValue.ReadyForPicks
     const startDate = entry?.matchCommenceStartDate ?? match.matchCommenceStartDate
     if (apiStatus === MatchStatusValue.ReadyForPicks && isClosed(startDate)) {
       return MatchStatusValue.PicksClosed
@@ -75,6 +77,7 @@ export function MatchesPage({
   }
 
   const selectedEffectiveStatus = selectedMatch ? getEffectiveStatus(selectedMatch) : MatchStatusValue.NotStarted
+  const selectedIsDelayed = selectedMatch ? !!(matchStatuses[selectedMatch.id]?.isDelayed) : false
   const picksOpen = selectedEffectiveStatus === MatchStatusValue.ReadyForPicks
   const isMatchCompleted = selectedEffectiveStatus === MatchStatusValue.MatchCompleted
   const isSettled = selectedEffectiveStatus >= MatchStatusValue.BetsSettled
@@ -155,7 +158,8 @@ export function MatchesPage({
           {matches.length === 0 ? <p className="subtle">No matches for this filter.</p> : null}
           {matches.map((match) => {
             const effectiveStartDate = matchStatuses[match.id]?.matchCommenceStartDate ?? match.matchCommenceStartDate
-            const closeLabel = countdownLabel(effectiveStartDate)
+            const matchIsDelayed = !!(matchStatuses[match.id]?.isDelayed)
+            const closeLabel = matchIsDelayed ? '⏸ Delayed' : countdownLabel(effectiveStartDate)
             const isActive = selectedMatchId === match.id
             const effectiveStatus = getEffectiveStatus(match)
             return (
@@ -170,7 +174,7 @@ export function MatchesPage({
                     {match.firstBattingTeamCode} vs {match.secondBattingTeamCode}
                   </span>
                   <span className={`match-status-chip match-status-chip--${effectiveStatus}`}>
-                    {MATCH_STATUS_LABELS[effectiveStatus]}
+                    {MATCH_STATUS_LABELS[effectiveStatus]}{matchIsDelayed ? ' · Delayed' : ''}
                   </span>
                 </div>
                 <p>{match.matchName}</p>
@@ -203,6 +207,13 @@ export function MatchesPage({
         {selectedMatch && isMatchCompleted && (
           <div className="status-banner status-banner--match-completed">
             🏁 Match completed — credits will be settled shortly
+          </div>
+        )}
+
+        {/* ── Delayed banner ────────────────────────────────────────────── */}
+        {selectedMatch && selectedIsDelayed && picksOpen && (
+          <div className="status-banner" style={{ background: '#f59e0b22', borderColor: '#f59e0b66', color: '#f59e0b' }}>
+            ⏸ This match has been delayed. Picks are still open — you can update your selections.
           </div>
         )}
 

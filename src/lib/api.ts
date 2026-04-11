@@ -52,6 +52,7 @@ export interface MatchStatusResponse {
   matchId: string
   status: number
   matchCommenceStartDate?: string | null
+  isDelayed?: boolean | null
 }
 
 export const api = {

@@ -1,7 +1,6 @@
 import type { Answer, LeaderboardEntry, MatchStatusRecord, Question, Transaction, UserAnswer } from './types'
 
-// const BASE_URL = 'https://iplgaming20260322122951-axd9czg3bzewdeez.centralus-01.azurewebsites.net'
-const BASE_URL = 'https://localhost:44331'
+const BASE_URL = import.meta.env.VITE_API_BASE_URL as string
 const STORAGE_KEY = 'ipl-api-key'
 
 export const getApiKey = () => localStorage.getItem(STORAGE_KEY)

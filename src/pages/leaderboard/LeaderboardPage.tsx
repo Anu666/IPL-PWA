@@ -1,11 +1,32 @@
-import type { LeaderboardEntry } from '../lib/types'
+import { useState, useEffect } from 'react'
+import { api } from '../../lib/api'
+import type { LeaderboardEntry } from '../../lib/types'
 
 interface LeaderboardPageProps {
-  rows: LeaderboardEntry[]
-  currentUserId: string | null
+  userId: string | null
 }
 
-export function LeaderboardPage({ rows, currentUserId }: LeaderboardPageProps) {
+export function LeaderboardPage({ userId }: LeaderboardPageProps) {
+  const [rows, setRows] = useState<LeaderboardEntry[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    api.leaderboard
+      .get()
+      .then(setRows)
+      .catch(() => setRows([]))
+      .finally(() => setLoading(false))
+  }, [])
+
+  if (loading) {
+    return (
+      <section className="panel">
+        <h2>Leaderboard</h2>
+        <p className="subtle">Loading…</p>
+      </section>
+    )
+  }
+
   if (rows.length === 0) {
     return (
       <section className="panel">
@@ -35,14 +56,23 @@ export function LeaderboardPage({ rows, currentUserId }: LeaderboardPageProps) {
           </thead>
           <tbody>
             {rows.map((row) => {
-              const isMe = row.userId === currentUserId
+              const isMe = row.userId === userId
               const pnlSign = row.totalCreditChange >= 0 ? '+' : ''
               return (
                 <tr key={row.userId} className={isMe ? 'lb-row--me' : undefined}>
                   <td>#{row.rank}</td>
                   <td>{isMe ? <strong>{row.userName}</strong> : row.userName}</td>
-                  <td style={{ color: row.totalCreditChange >= 0 ? 'var(--color-win, #22c55e)' : 'var(--color-loss, #ef4444)', fontWeight: 600 }}>
-                    {pnlSign}{row.totalCreditChange.toFixed(2)}
+                  <td
+                    style={{
+                      color:
+                        row.totalCreditChange >= 0
+                          ? 'var(--color-win, #22c55e)'
+                          : 'var(--color-loss, #ef4444)',
+                      fontWeight: 600,
+                    }}
+                  >
+                    {pnlSign}
+                    {row.totalCreditChange.toFixed(2)}
                   </td>
                   <td>{row.correctPredictions}</td>
                   <td>{row.wrongPredictions}</td>

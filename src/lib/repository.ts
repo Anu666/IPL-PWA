@@ -5,11 +5,11 @@ import type { Answer, LeaderboardEntry, Question, UserHistoryEntry } from './typ
 export const repository = {
   getMatches: async () => getMappedMatches(),
 
-  getQuestionsByMatch: async (matchId: string): Promise<Question[]> => {
+  getQuestionsByMatch: async (matchId: string, effectiveStartDate?: string): Promise<Question[]> => {
     const matches = getMappedMatches()
     const match = matches.find((m) => m.id === matchId)
     const rawQuestions = await api.questions.getByMatch(matchId)
-    const closesAtIst = match?.matchCommenceStartDate ?? new Date().toISOString()
+    const closesAtIst = effectiveStartDate ?? match?.matchCommenceStartDate ?? new Date().toISOString()
     return rawQuestions
       .map((q) => ({ ...q, closesAtIst }))
       .sort((a, b) => a.sequence - b.sequence)

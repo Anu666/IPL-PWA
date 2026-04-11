@@ -1,13 +1,13 @@
-import { useEffect, useState } from 'react'
-import matchSchedule from '../assets/json/match-schedule.json'
-import { api } from '../lib/api'
+﻿import { useEffect, useState } from 'react'
+import matchSchedule from '../../assets/json/match-schedule.json'
+import { api } from '../../lib/api'
 import {
   TransactionType,
   TransactionStatus,
   TRANSACTION_TYPE_LABELS,
   TRANSACTION_STATUS_LABELS,
   type Transaction,
-} from '../lib/types'
+} from '../../lib/types'
 
 interface CreditsPageProps {
   currentCredits: number
@@ -15,7 +15,7 @@ interface CreditsPageProps {
 
 type TypeFilter = TransactionType | 'all'
 
-// id → "RCB vs SRH"
+// id â†’ "RCB vs SRH"
 const matchLookup = new Map(
   (matchSchedule as Array<{ id: string; firstBattingTeamCode: string; secondBattingTeamCode: string }>).map(
     (m) => [m.id, `${m.firstBattingTeamCode} vs ${m.secondBattingTeamCode}`],
@@ -23,7 +23,7 @@ const matchLookup = new Map(
 )
 
 function formatDateTime(iso: string): string {
-  if (!iso) return '—'
+  if (!iso) return 'â€”'
   const d = new Date(iso)
   if (isNaN(d.getTime())) return iso
   return d.toLocaleString('en-IN', {
@@ -91,14 +91,14 @@ export function CreditsPage({ currentCredits }: CreditsPageProps) {
 
   return (
     <div className="credits-page">
-      {/* ── Balance hero ────────────────────────────────────────────── */}
+      {/* â”€â”€ Balance hero â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="credits-hero">
         <p className="credits-hero-label">Current Balance</p>
         <p className="credits-hero-amount">{currentCredits.toFixed(2)}</p>
         <p className="credits-hero-unit">credits</p>
       </div>
 
-      {/* ── Type filter chips ────────────────────────────────────────── */}
+      {/* â”€â”€ Type filter chips â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="credits-filters">
         {TYPE_FILTER_OPTIONS.map((opt) => (
           <button
@@ -112,11 +112,11 @@ export function CreditsPage({ currentCredits }: CreditsPageProps) {
         ))}
       </div>
 
-      {/* ── Results ─────────────────────────────────────────────────── */}
+      {/* â”€â”€ Results â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="panel credits-table-panel">
         {loading && (
           <p className="subtle" style={{ textAlign: 'center', padding: '1.5rem 0' }}>
-            Loading transactions…
+            Loading transactionsâ€¦
           </p>
         )}
 
@@ -158,7 +158,7 @@ export function CreditsPage({ currentCredits }: CreditsPageProps) {
                         </span>
                       </td>
                       <td className="credits-td-match">
-                        {t.matchId ? (matchLookup.get(t.matchId) ?? '—') : '—'}
+                        {t.matchId ? (matchLookup.get(t.matchId) ?? 'â€”') : 'â€”'}
                       </td>
                       <td
                         className={

@@ -1,4 +1,4 @@
-import type { ApiUser } from '../lib/api'
+﻿import type { ApiUser } from '../../lib/api'
 
 interface UserDetailsPageProps {
   user: ApiUser | null
@@ -26,7 +26,7 @@ export function UserDetailsPage({
             </div>
             <div className="user-stat-card">
               <p className="subtle">Phone</p>
-              <strong>{user.phoneNumber || '—'}</strong>
+              <strong>{user.phoneNumber || 'â€”'}</strong>
             </div>
             <div className="user-stat-card">
               <p className="subtle">Joined</p>

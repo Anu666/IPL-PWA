@@ -9,6 +9,7 @@ export function useMatchData(
   effectiveStartDate: string,
 ) {
   const [questions, setQuestions] = useState<Question[]>([])
+  const [loading, setLoading] = useState(false)
   const [questionSelections, setQuestionSelections] = useState<Record<string, number>>({})
   const [userAnswerIds, setUserAnswerIds] = useState<Record<string, string>>({})
   const [saveErrors, setSaveErrors] = useState<Record<string, string>>({})
@@ -25,10 +26,13 @@ export function useMatchData(
   useEffect(() => {
     if (!matchId || !userId) {
       setQuestions([])
+      setLoading(false)
       return
     }
 
     let cancelled = false
+    setQuestions([])
+    setLoading(true)
 
     void (async () => {
       const [nextQuestions, existingAnswer] = await Promise.all([
@@ -39,6 +43,7 @@ export function useMatchData(
       if (cancelled) return
 
       setQuestions(nextQuestions)
+      setLoading(false)
 
       if (existingAnswer) {
         setUserAnswerIds((prev) => ({ ...prev, [matchId]: existingAnswer.id }))
@@ -104,5 +109,5 @@ export function useMatchData(
     [userId],
   )
 
-  return { questions, questionSelections, saveErrors, saveSelection }
+  return { questions, loading, questionSelections, saveErrors, saveSelection }
 }

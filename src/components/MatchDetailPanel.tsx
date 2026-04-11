@@ -61,7 +61,7 @@ export function MatchDetailPanel({
   }, [effectiveStartDate])
 
   // Questions, selections, and save logic
-  const { questions, questionSelections, saveErrors, saveSelection } = useMatchData(
+  const { questions, loading, questionSelections, saveErrors, saveSelection } = useMatchData(
     matchId,
     userId,
     effectiveStartDate,
@@ -112,6 +112,16 @@ export function MatchDetailPanel({
 
   return (
     <>
+      {/* ── Loading indicator ──────────────────────────────────────────── */}
+      {loading && (
+        <div className="panel-loading">
+          <span className="panel-spinner" />
+          <span className="panel-loading-text">Loading…</span>
+        </div>
+      )}
+
+      {!loading && (
+        <>
       {/* ── Delayed banner ─────────────────────────────────────────────── */}
       {isDelayed && picksOpen && (
         <div
@@ -524,6 +534,8 @@ export function MatchDetailPanel({
           </div>
         </div>
       ) : null}
+        </>
+      )}
     </>
   )
 }

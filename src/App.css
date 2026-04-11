@@ -1829,3 +1829,32 @@ body.menu-open {
 
 
 
+
+/* -- Panel loading spinner ------------------------------------------------ */
+.panel-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 3rem 1rem;
+}
+
+.panel-loading-text {
+  font-size: 0.9rem;
+  opacity: 0.55;
+}
+
+.panel-spinner {
+  display: block;
+  width: 2rem;
+  height: 2rem;
+  border: 3px solid #ffffff18;
+  border-top-color: var(--accent, #6c63ff);
+  border-radius: 50%;
+  animation: panel-spin 0.75s linear infinite;
+}
+
+@keyframes panel-spin {
+  to { transform: rotate(360deg); }
+}

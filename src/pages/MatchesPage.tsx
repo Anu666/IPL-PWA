@@ -28,7 +28,7 @@ interface MatchesPageProps {
   activeFilter: MatchFilter
   questionSelections: Record<string, number>
   saveErrors: Record<string, string>
-  matchStatuses: Record<string, number>
+  matchStatuses: Record<string, { status: number; matchCommenceStartDate?: string | null }>
   userId: string | null
   onFilterChange: (nextFilter: MatchFilter) => void
   onSelectMatch: (matchId: string) => void
@@ -56,16 +56,19 @@ export function MatchesPage({
   const [detailActive, setDetailActive] = useState(false)
   useEffect(() => {
     if (!selectedMatch) return
-    const msToStart = new Date(selectedMatch.matchCommenceStartDate).getTime() - Date.now()
+    const effectiveStart = matchStatuses[selectedMatch.id]?.matchCommenceStartDate ?? selectedMatch.matchCommenceStartDate
+    const msToStart = new Date(effectiveStart).getTime() - Date.now()
     const isNearStart = msToStart > 0 && msToStart <= 10 * 60 * 1000
     if (!isNearStart) return
     const id = setInterval(() => setSecondTick((t) => t + 1), 1000)
     return () => clearInterval(id)
-  }, [selectedMatch])
+  }, [selectedMatch, matchStatuses])
 
   const getEffectiveStatus = (match: Match): number => {
-    const apiStatus = matchStatuses[match.id] ?? MatchStatusValue.NotStarted
-    if (apiStatus === MatchStatusValue.ReadyForPicks && isClosed(match.matchCommenceStartDate)) {
+    const entry = matchStatuses[match.id]
+    const apiStatus = entry?.status ?? MatchStatusValue.NotStarted
+    const startDate = entry?.matchCommenceStartDate ?? match.matchCommenceStartDate
+    if (apiStatus === MatchStatusValue.ReadyForPicks && isClosed(startDate)) {
       return MatchStatusValue.PicksClosed
     }
     return apiStatus
@@ -151,7 +154,8 @@ export function MatchesPage({
         <div className="match-list">
           {matches.length === 0 ? <p className="subtle">No matches for this filter.</p> : null}
           {matches.map((match) => {
-            const closeLabel = countdownLabel(match.matchCommenceStartDate)
+            const effectiveStartDate = matchStatuses[match.id]?.matchCommenceStartDate ?? match.matchCommenceStartDate
+            const closeLabel = countdownLabel(effectiveStartDate)
             const isActive = selectedMatchId === match.id
             const effectiveStatus = getEffectiveStatus(match)
             return (
@@ -171,7 +175,7 @@ export function MatchesPage({
                 </div>
                 <p>{match.matchName}</p>
                 <small>
-                  {toDisplayDate(match.matchCommenceStartDate)} | {closeLabel}
+                  {toDisplayDate(effectiveStartDate)} | {closeLabel}
                 </small>
               </button>
             )
@@ -191,7 +195,7 @@ export function MatchesPage({
         {selectedMatch ? (
           <p className="subtle">
             {selectedMatch.groundName}, {selectedMatch.city} | Starts{' '}
-            {toDisplayDate(selectedMatch.matchCommenceStartDate)}
+            {toDisplayDate(matchStatuses[selectedMatch.id]?.matchCommenceStartDate ?? selectedMatch.matchCommenceStartDate)}
           </p>
         ) : null}
 

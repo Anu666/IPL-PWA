@@ -49,14 +49,17 @@ interface HomePageProps {
   questions: Question[]
   questionSelections: Record<string, number>
   saveErrors: Record<string, string>
-  matchStatuses: Record<string, number>
+  matchStatuses: Record<string, { status: number; matchCommenceStartDate?: string | null }>
   userId: string | null
   onSelectMatch: (matchId: string) => void
   onSaveSelection: (question: Question, selectedOptionId: number) => Promise<void>
 }
 
 export function HomePage({ match, homeMatches, selectedHomeMatchId, questions, questionSelections, saveErrors, matchStatuses, userId, onSelectMatch, onSaveSelection }: HomePageProps) {
-  const msToStart = match ? new Date(match.matchCommenceStartDate).getTime() - Date.now() : Infinity
+  const effectiveMatchStartDate = match
+    ? (matchStatuses[match.id]?.matchCommenceStartDate ?? match.matchCommenceStartDate)
+    : ''
+  const msToStart = effectiveMatchStartDate ? new Date(effectiveMatchStartDate).getTime() - Date.now() : Infinity
   const isLastTenMin = msToStart > 0 && msToStart <= 10 * 60 * 1000
 
   const [, setSecondTick] = useState(0)
@@ -72,8 +75,10 @@ export function HomePage({ match, homeMatches, selectedHomeMatchId, questions, q
 
   // ── Per-match effective status helper ────────────────────────────────────────
   const getEffectiveStatusForMatch = (m: Match): number => {
-    const s = matchStatuses[m.id] ?? MatchStatusValue.NotStarted
-    if (s === MatchStatusValue.ReadyForPicks && isClosed(m.matchCommenceStartDate)) {
+    const entry = matchStatuses[m.id]
+    const s = entry?.status ?? MatchStatusValue.NotStarted
+    const startDate = entry?.matchCommenceStartDate ?? m.matchCommenceStartDate
+    if (s === MatchStatusValue.ReadyForPicks && isClosed(startDate)) {
       return MatchStatusValue.PicksClosed
     }
     return s
@@ -128,9 +133,9 @@ export function HomePage({ match, homeMatches, selectedHomeMatchId, questions, q
   }, [visibleMatches, selectedHomeMatchId, onSelectMatch])
 
   // Effective status for SELECTED match
-  const apiStatus = match ? (matchStatuses[match.id] ?? MatchStatusValue.NotStarted) : MatchStatusValue.NotStarted
+  const apiStatus = match ? (matchStatuses[match.id]?.status ?? MatchStatusValue.NotStarted) : MatchStatusValue.NotStarted
   const effectiveStatus =
-    apiStatus === MatchStatusValue.ReadyForPicks && match && isClosed(match.matchCommenceStartDate)
+    apiStatus === MatchStatusValue.ReadyForPicks && match && isClosed(effectiveMatchStartDate)
       ? MatchStatusValue.PicksClosed
       : apiStatus
 
@@ -226,8 +231,8 @@ export function HomePage({ match, homeMatches, selectedHomeMatchId, questions, q
               <p className="subtle home-match-name">{match.matchName}</p>
               <p className="subtle">{match.groundName}, {match.city}</p>
               <p className="subtle">
-                {toDisplayDate(match.matchCommenceStartDate)}&ensp;·&ensp;
-                <strong style={{ color: 'var(--sun)' }}>{countdownLabel(match.matchCommenceStartDate)}</strong>
+                {toDisplayDate(effectiveMatchStartDate)}&ensp;·&ensp;
+                <strong style={{ color: 'var(--sun)' }}>{countdownLabel(effectiveMatchStartDate)}</strong>
               </p>
             </div>
 

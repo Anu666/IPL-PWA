@@ -103,6 +103,7 @@ export interface MatchStatusRecord {
   id: string
   matchId: string
   status: number
+  matchCommenceStartDate?: string | null
   matchSummary?: MatchSummaryEntry[] | null
 }
 

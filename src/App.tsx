@@ -3,7 +3,7 @@ import './App.css'
 import { ApiKeyGate } from './components/ApiKeyGate'
 import { SideMenu, type AppScreen } from './components/SideMenu'
 import { TopBar } from './components/TopBar'
-import { api, clearApiKey, getApiKey, type ApiUser } from './lib/api'
+import { api, clearApiKey, getApiKey, type ApiUser, type MatchStatusResponse } from './lib/api'
 import { repository } from './lib/repository'
 import { isClosed } from './lib/time'
 import type {
@@ -66,7 +66,7 @@ function App() {
   const [currentCredits, setCurrentCredits] = useState(0)
   const [currentUser, setCurrentUser] = useState<ApiUser | null>(null)
   const [clockTick, setClockTick] = useState(0)
-  const [matchStatuses, setMatchStatuses] = useState<Record<string, number>>({})
+  const [matchStatuses, setMatchStatuses] = useState<Record<string, { status: number; matchCommenceStartDate?: string | null }>>({})   
   // Per-question save error: questionId -> error message
   const [saveErrors, setSaveErrors] = useState<Record<string, string>>({})
   // Tracks match IDs that currently have a save in-flight to prevent concurrent requests
@@ -130,7 +130,7 @@ function App() {
 
   const homeMatchPool = useMemo(() => {
     const nonStarted = matches.filter(
-      (m) => (matchStatuses[m.id] ?? MatchStatusValue.NotStarted) !== MatchStatusValue.NotStarted,
+      (m) => (matchStatuses[m.id]?.status ?? MatchStatusValue.NotStarted) !== MatchStatusValue.NotStarted,
     ).sort(
       (a, b) => new Date(a.matchCommenceStartDate).getTime() - new Date(b.matchCommenceStartDate).getTime(),
     )
@@ -154,12 +154,12 @@ function App() {
     // once with complete data — no intermediate state with stale questions.
     const [allMatches, allStatuses] = await Promise.all([
       repository.getMatches(),
-      api.matchStatuses.getAll().catch(() => [] as { matchId: string; status: number }[]),
+      api.matchStatuses.getAll().catch(() => [] as MatchStatusResponse[]),
     ])
 
     const firstMatchId = allMatches[0]?.id ?? null
-    const statusMap: Record<string, number> = {}
-    for (const s of allStatuses) { statusMap[s.matchId] = s.status }
+    const statusMap: Record<string, { status: number; matchCommenceStartDate?: string | null }> = {}
+    for (const s of allStatuses) { statusMap[s.matchId] = { status: s.status, matchCommenceStartDate: s.matchCommenceStartDate } }
 
     // Both set synchronously — React 18 batches these into one render,
     // so homeMatchPool is computed with full statuses on first evaluation.

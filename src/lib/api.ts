@@ -48,9 +48,10 @@ interface ApiQuestion {
   correctOptionId: number | null
 }
 
-interface MatchStatusResponse {
+export interface MatchStatusResponse {
   matchId: string
   status: number
+  matchCommenceStartDate?: string | null
 }
 
 export const api = {

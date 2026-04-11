@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import './App.css'
 import { ApiKeyGate } from './components/ApiKeyGate'
 import { SideMenu, type AppScreen } from './components/SideMenu'
 import { TopBar } from './components/TopBar'

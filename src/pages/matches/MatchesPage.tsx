@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
+import styles from './MatchesPage.module.css'
 import { countdownLabel, isClosed, toDisplayDate } from '../../lib/time'
 import { MatchStatusValue, MATCH_STATUS_LABELS } from '../../lib/types'
 import type { Match } from '../../lib/types'
@@ -84,19 +85,19 @@ export function MatchesPage({ userId }: MatchesPageProps) {
       <article className="panel">
         <h2>Match List</h2>
         <p className="subtle">Each match has 5 questions, total 50 credits.</p>
-        <div className="filter-row" role="group" aria-label="Match filters">
+        <div className={styles.filterRow} role="group" aria-label="Match filters">
           {(['all', 'active', 'upcoming', 'past'] as const).map((f) => (
             <button
               key={f}
               type="button"
-              className={matchFilter === f ? 'filter-chip active' : 'filter-chip'}
+              className={matchFilter === f ? `${styles.filterChip} ${styles.active}` : styles.filterChip}
               onClick={() => setMatchFilter(f)}
             >
               {f === 'all' ? 'All' : f === 'active' ? 'Active' : f === 'upcoming' ? 'Upcoming' : 'Past'}
             </button>
           ))}
         </div>
-        <div className="match-list">
+        <div className={styles.matchList}>
           {filteredMatches.length === 0 ? (
             <p className="subtle">No matches for this filter.</p>
           ) : null}
@@ -111,13 +112,13 @@ export function MatchesPage({ userId }: MatchesPageProps) {
               <button
                 key={match.id}
                 type="button"
-                className={isActive ? 'match-card active' : 'match-card'}
+                className={isActive ? `${styles.matchCard} ${styles.active}` : styles.matchCard}
                 onClick={() => {
                   setSelectedMatchId(match.id)
                   setDetailActive(true)
                 }}
               >
-                <div className="match-card-head">
+                <div className={styles.matchCardHead}>
                   <span>
                     {match.firstBattingTeamCode} vs {match.secondBattingTeamCode}
                   </span>
@@ -139,7 +140,7 @@ export function MatchesPage({ userId }: MatchesPageProps) {
       <article className="panel">
         <button
           type="button"
-          className="detail-back-btn"
+          className={styles.detailBackBtn}
           onClick={() => setDetailActive(false)}
         >
           ← Back to matches

@@ -1,3 +1,5 @@
+import styles from './TopBar.module.css'
+
 interface TopBarProps {
   currentUser: { id: string; name: string } | null
   currentCredits: number
@@ -12,25 +14,25 @@ export function TopBar({
   onRefreshCredits,
 }: TopBarProps) {
   return (
-    <header className="topbar">
-      <div className="topbar-left">
-        <button type="button" className="menu-btn" onClick={onMenuClick} aria-label="Open menu">
+    <header className={styles.topbar}>
+      <div className={styles.topbarLeft}>
+        <button type="button" className={styles.menuBtn} onClick={onMenuClick} aria-label="Open menu">
           <span />
           <span />
           <span />
         </button>
-        <h1 className="topbar-title">IPL Gaming</h1>
+        <h1 className={styles.topbarTitle}>IPL Gaming</h1>
       </div>
-      <div className="topbar-right">
+      <div className={styles.topbarRight}>
         {currentUser ? (
-          <div className="credit-pill">
-            <div className="credit-pill-text">
+          <div className={styles.creditPill}>
+            <div className={styles.creditPillText}>
               <span>{currentUser.name}</span>
               <strong style={{ color: 'var(--sun)' }}>{currentCredits.toFixed(2)} credits</strong>
             </div>
             <button
               type="button"
-              className="refresh-btn"
+              className={styles.refreshBtn}
               onClick={() => void onRefreshCredits()}
               aria-label="Refresh credits"
             >

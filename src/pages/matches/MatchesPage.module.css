@@ -1,0 +1,136 @@
+.filter-row {
+  display: flex;
+  gap: 0.45rem;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.filter-chip {
+  border: 1px solid #ffffff22;
+  border-radius: 999px;
+  background: #ffffff0d;
+  color: var(--paper);
+  padding: 0.45rem 0.8rem;
+  min-height: 40px;
+  white-space: nowrap;
+  cursor: pointer;
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-size: 0.88rem;
+  transition: background 0.15s;
+}
+
+.filter-chip:hover {
+  background: #ffffff16;
+}
+
+.filter-chip.active {
+  border-color: transparent;
+  background: linear-gradient(90deg, var(--teal), #3a86ff);
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .filter-chip {
+    min-height: 36px;
+    font-size: 0.86rem;
+  }
+}
+
+/* ── Match list ──────────────────────────────────────────────────────────── */
+.match-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+/* ── Match cards ─────────────────────────────────────────────────────────── */
+.match-card {
+  width: 100%;
+  text-align: left;
+  border: 1px solid #ffffff1a;
+  border-radius: 0.9rem;
+  background: #ffffff0d;
+  color: #fff;
+  padding: 0.85rem;
+  min-height: 44px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  overflow: hidden;
+}
+
+.match-card:hover {
+  background: #ffffff14;
+}
+
+.match-card.active {
+  border-color: var(--sun);
+  background: #ffb70310;
+  box-shadow: 0 0 0 1px #ffb70344;
+}
+
+.match-card p,
+.match-card small {
+  margin: 0;
+}
+
+.match-card small {
+  opacity: 0.6;
+  font-size: 0.82rem;
+}
+
+.match-card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+
+.match-card-head > span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* .match-status-chip is a global class — use :global() to reference it */
+.match-card-head > :global(.match-status-chip) {
+  flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+  .match-card-head {
+    align-items: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .match-card-head {
+    flex-wrap: wrap;
+  }
+}
+
+/* ── Detail back button (mobile only) ───────────────────────────────────── */
+.detail-back-btn {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .detail-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: none;
+    border: none;
+    color: var(--accent, #60a5fa);
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 0 0 0.75rem 0;
+    cursor: pointer;
+    letter-spacing: 0.01em;
+  }
+
+  .detail-back-btn:hover {
+    opacity: 0.8;
+  }
+}

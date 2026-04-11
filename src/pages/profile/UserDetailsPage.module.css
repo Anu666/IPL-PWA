@@ -1,0 +1,56 @@
+.user-panel {
+  max-width: 1220px;
+}
+
+.user-details-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.user-stat-card {
+  border: 1px solid #ffffff1a;
+  border-radius: 0.9rem;
+  padding: 0.85rem;
+  background: #ffffff0d;
+}
+
+/* Override .subtle margin within stat cards */
+.user-stat-card :global(.subtle) {
+  margin-bottom: 0.25rem;
+}
+
+.user-section-title {
+  margin: 1rem 0 0.6rem;
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+}
+
+.user-history-btn {
+  margin-top: 1rem;
+}
+
+.user-credits-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.user-credits-refresh {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding-bottom: 0.1rem;
+}
+
+@media (max-width: 900px) {
+  .user-details-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .user-details-grid {
+    grid-template-columns: 1fr;
+  }
+}

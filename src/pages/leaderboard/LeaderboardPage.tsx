@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import styles from './LeaderboardPage.module.css'
 import { api } from '../../lib/api'
 import type { LeaderboardEntry } from '../../lib/types'
 
@@ -39,8 +40,8 @@ export function LeaderboardPage({ userId }: LeaderboardPageProps) {
   return (
     <section className="panel">
       <h2>Leaderboard</h2>
-      <div className="history-table-wrap">
-        <table className="history-table history-table--lb">
+      <div className={styles.historyTableWrap}>
+        <table className={`${styles.historyTable} ${styles.historyTableLb}`}>
           <thead>
             <tr>
               <th>Rank</th>
@@ -59,7 +60,7 @@ export function LeaderboardPage({ userId }: LeaderboardPageProps) {
               const isMe = row.userId === userId
               const pnlSign = row.totalCreditChange >= 0 ? '+' : ''
               return (
-                <tr key={row.userId} className={isMe ? 'lb-row--me' : undefined}>
+                <tr key={row.userId} className={isMe ? styles.lbRowMe : undefined}>
                   <td>#{row.rank}</td>
                   <td>{isMe ? <strong>{row.userName}</strong> : row.userName}</td>
                   <td

@@ -4,6 +4,7 @@ import { MatchStatusValue, MATCH_STATUS_LABELS, OutcomeType } from '../lib/types
 import type { MatchStatusRecord, Question } from '../lib/types'
 import { api } from '../lib/api'
 import { useMatchData } from '../hooks/useMatchData'
+import styles from './MatchDetailPanel.module.css'
 
 const OUTCOME_SHORT: Record<number, string> = {
   [OutcomeType.Won]: 'W',
@@ -17,6 +18,20 @@ const OUTCOME_CSS_CLASS: Record<number, string> = {
   [OutcomeType.Lost]: 'lost',
   [OutcomeType.AutoLost]: 'autolost',
   [OutcomeType.Voided]: 'voided',
+}
+
+// Module-level lookups for dynamic variant classes
+const COMMUNITY_CHIP_CLASS: Record<string, string> = {
+  won: styles.communityChipWon,
+  lost: styles.communityChipLost,
+  autolost: styles.communityChipAutolost,
+  voided: styles.communityChipVoided,
+}
+
+const OUTCOME_CHIP_CLASS: Record<string, string> = {
+  won: styles.outcomeChipWon,
+  lost: styles.outcomeChipLost,
+  voided: styles.outcomeChipVoided,
 }
 
 interface MatchDetailPanelProps {
@@ -114,9 +129,9 @@ export function MatchDetailPanel({
     <>
       {/* ── Loading indicator ──────────────────────────────────────────── */}
       {loading && (
-        <div className="panel-loading">
-          <span className="panel-spinner" />
-          <span className="panel-loading-text">Loading…</span>
+        <div className={styles.panelLoading}>
+          <span className={styles.panelSpinner} />
+          <span className={styles.panelLoadingText}>Loading…</span>
         </div>
       )}
 
@@ -125,7 +140,7 @@ export function MatchDetailPanel({
       {/* ── Delayed banner ─────────────────────────────────────────────── */}
       {isDelayed && picksOpen && (
         <div
-          className="status-banner"
+          className={styles.statusBanner}
           style={{ background: '#f59e0b22', borderColor: '#f59e0b66', color: '#f59e0b' }}
         >
           ⏸ This match has been delayed. Picks are still open — you can update your selections.
@@ -134,47 +149,47 @@ export function MatchDetailPanel({
 
       {/* ── MatchCompleted banner ──────────────────────────────────────── */}
       {isMatchCompleted && (
-        <div className="status-banner status-banner--match-completed">
+        <div className={`${styles.statusBanner} ${styles.statusBannerMatchCompleted}`}>
           🏁 Match completed — credits will be settled shortly
         </div>
       )}
 
       {/* ── BetsSettled+ settlement view ───────────────────────────────── */}
       {isSettled && (
-        <div className="settlement-view">
+        <div className={styles.settlementView}>
           {isDone ? (
-            <div className="status-banner status-banner--done">
+            <div className={`${styles.statusBanner} ${styles.statusBannerDone}`}>
               🏆 This match has been successfully completed
             </div>
           ) : isTransactionsSettled ? (
-            <div className="status-banner status-banner--txn-settled">
+            <div className={`${styles.statusBanner} ${styles.statusBannerTxnSettled}`}>
               ✅ Credits are now reflected in your account
             </div>
           ) : (
-            <div className="status-banner status-banner--bets-settled">
+            <div className={`${styles.statusBanner} ${styles.statusBannerBetsSettled}`}>
               ✅ Bets settled — credits being processed
             </div>
           )}
 
           {questions.length > 0 && (
-            <div className="outcome-section">
+            <div className={styles.outcomeSection}>
               {personalOutcome !== null && (
                 <div
-                  className={`outcome-total-card${
+                  className={`${styles.outcomeTotalCard} ${
                     personalOutcome.overallCreditChange >= 0
-                      ? ' outcome-total-card--pos'
-                      : ' outcome-total-card--neg'
+                      ? styles.outcomeTotalCardPos
+                      : styles.outcomeTotalCardNeg
                   }`}
                 >
-                  <span className="outcome-total-label">Your result</span>
-                  <span className="outcome-total-value">
+                  <span className={styles.outcomeTotalLabel}>Your result</span>
+                  <span className={styles.outcomeTotalValue}>
                     {personalOutcome.overallCreditChange >= 0 ? '+' : ''}
                     {personalOutcome.overallCreditChange.toFixed(2)} cr
                   </span>
                 </div>
               )}
 
-              <div className="outcome-question-list">
+              <div className={styles.outcomeQuestionList}>
                 {questions.map((q) => {
                   const selectedOption = questionSelections[q.id]
                   const info = getQuestionOutcomeInfo(q, selectedOption)
@@ -188,29 +203,29 @@ export function MatchDetailPanel({
                       ? (q.options.find((o) => o.id === selectedOption)?.optionText ?? '—')
                       : 'Not answered'
                   return (
-                    <div key={q.id} className="outcome-question-row">
-                      <div className="outcome-q-header">
-                        <div className="outcome-q-text">
+                    <div key={q.id} className={styles.outcomeQuestionRow}>
+                      <div className={styles.outcomeQHeader}>
+                        <div className={styles.outcomeQText}>
                           {q.sequence}. {q.questionText}
                         </div>
-                        <span className="question-credits">{q.credits.toFixed(2)} cr</span>
+                        <span className={styles.questionCredits}>{q.credits.toFixed(2)} cr</span>
                       </div>
-                      <div className="outcome-q-meta">
-                        <span className="outcome-q-mypick">Your pick: {myLabel}</span>
-                        <span className="outcome-q-correct">Correct pick: {correctLabel}</span>
+                      <div className={styles.outcomeQMeta}>
+                        <span className={styles.outcomeQMypick}>Your pick: {myLabel}</span>
+                        <span className={styles.outcomeQCorrect}>Correct pick: {correctLabel}</span>
                       </div>
                       {info && (
-                        <div className="outcome-q-result">
-                          <span className={`outcome-chip outcome-chip--${info.cssClass}`}>
+                        <div className={styles.outcomeQResult}>
+                          <span className={`${styles.outcomeChip} ${OUTCOME_CHIP_CLASS[info.cssClass] ?? ''}`}>
                             {info.label}
                           </span>
                           <span
-                            className={`outcome-delta${
+                            className={`${styles.outcomeDelta}${
                               info.cssClass === 'won'
-                                ? ' outcome-delta--pos'
+                                ? ' ' + styles.outcomeDeltaPos
                                 : info.cssClass === 'voided'
                                 ? ''
-                                : ' outcome-delta--neg'
+                                : ' ' + styles.outcomeDeltaNeg
                             }`}
                           >
                             {info.deltaText}
@@ -223,12 +238,11 @@ export function MatchDetailPanel({
               </div>
             </div>
           )}
-
           {rankedSummary.length > 0 && (
-            <div className="community-section">
-              <h4 className="community-title">Match Leaderboard</h4>
-              <div className="community-table-wrap">
-                <table className="community-table">
+            <div className={styles.communitySection}>
+              <h4 className={styles.communityTitle}>Match Leaderboard</h4>
+              <div className={styles.communityTableWrap}>
+                <table className={styles.communityTable}>
                   <thead>
                     <tr>
                       <th>#</th>
@@ -245,16 +259,16 @@ export function MatchDetailPanel({
                     {rankedSummary.map((entry, idx) => (
                       <tr
                         key={entry.userId}
-                        className={entry.userId === userId ? 'community-row--me' : ''}
+                        className={entry.userId === userId ? styles.communityRowMe : ''}
                       >
                         <td>{idx + 1}</td>
-                        <td className="community-name">
+                        <td className={styles.communityName}>
                           {entry.userName}
                           {entry.userId === userId ? ' (you)' : ''}
                         </td>
                         <td
                           className={
-                            entry.overallCreditChange >= 0 ? 'credit-pos' : 'credit-neg'
+                            entry.overallCreditChange >= 0 ? styles.creditPos : styles.creditNeg
                           }
                         >
                           {entry.overallCreditChange >= 0 ? '+' : ''}
@@ -266,9 +280,7 @@ export function MatchDetailPanel({
                           return (
                             <td key={q.id}>
                               <span
-                                className={`community-chip community-chip--${
-                                  OUTCOME_CSS_CLASS[change.outcome] ?? 'voided'
-                                }`}
+                                className={`${styles.communityChip} ${COMMUNITY_CHIP_CLASS[OUTCOME_CSS_CLASS[change.outcome] ?? 'voided'] ?? ''}`}
                               >
                                 {OUTCOME_SHORT[change.outcome] ?? '?'}
                               </span>
@@ -286,7 +298,7 @@ export function MatchDetailPanel({
           {questions.some((q) => q.bettingStats) && (
             <button
               type="button"
-              className="pwa-stats-btn"
+              className={styles.pwaStatsBtn}
               style={{ marginTop: '1rem' }}
               onClick={() => setShowStatsModal(true)}
             >
@@ -298,7 +310,7 @@ export function MatchDetailPanel({
 
       {/* ── Picks gated notice ─────────────────────────────────────────── */}
       {!picksOpen && !isSettled && (
-        <div className="picks-gated-notice">
+        <div className={styles.picksGatedNotice}>
           <span className={`match-status-chip match-status-chip--${effectiveStatus}`}>
             {MATCH_STATUS_LABELS[effectiveStatus]}
           </span>
@@ -317,22 +329,22 @@ export function MatchDetailPanel({
       ) : null}
 
       {questionsVisible && showBettingStats && questions.some((q) => q.bettingStats) ? (
-        <button type="button" className="pwa-stats-btn" onClick={() => setShowStatsModal(true)}>
+        <button type="button" className={styles.pwaStatsBtn} onClick={() => setShowStatsModal(true)}>
           📊 View Betting Stats
         </button>
       ) : null}
 
       {questionsVisible && questions.length > 0 ? (
-        <div className="question-list">
+        <div className={styles.questionList}>
           {questions.map((question) => {
             const locked = !picksOpen || isClosed(question.closesAtIst)
             const selectedOption = questionSelections[question.id]
             return (
-              <div className="question-card" key={question.id}>
-                <div className="question-head">
-                  <div className="question-head-top">
-                    <span className="question-credits">{question.credits.toFixed(2)} credits</span>
-                    <span className={locked ? 'lock-note locked' : 'lock-note open'}>
+              <div className={styles.questionCard} key={question.id}>
+                <div className={styles.questionHead}>
+                  <div className={styles.questionHeadTop}>
+                    <span className={styles.questionCredits}>{question.credits.toFixed(2)} credits</span>
+                    <span className={locked ? `${styles.lockNote} ${styles.locked}` : `${styles.lockNote} ${styles.open}`}>
                       {locked ? '🔒 Locked' : '✓ Open'}
                     </span>
                   </div>
@@ -341,7 +353,7 @@ export function MatchDetailPanel({
                   </h3>
                 </div>
                 <div
-                  className="option-list"
+                  className={styles.optionList}
                   style={{
                     gridTemplateColumns:
                       question.options.length > 3 ? 'repeat(2, 1fr)' : '1fr',
@@ -352,7 +364,9 @@ export function MatchDetailPanel({
                       key={option.id}
                       type="button"
                       className={
-                        selectedOption === option.id ? 'option-btn active' : 'option-btn'
+                        selectedOption === option.id
+                          ? `${styles.optionBtn} ${styles.active}`
+                          : styles.optionBtn
                       }
                       onClick={() => void saveSelection(question, option.id)}
                       disabled={locked}
@@ -362,7 +376,7 @@ export function MatchDetailPanel({
                   ))}
                 </div>
                 {saveErrors[question.id] ? (
-                  <p className="save-error">{saveErrors[question.id]}</p>
+                  <p className={styles.saveError}>{saveErrors[question.id]}</p>
                 ) : null}
 
                 {showBettingStats && question.bettingStats
@@ -375,8 +389,8 @@ export function MatchDetailPanel({
                           .every((os) => os.voteCount === 0)
                       if (stats.totalVotes === 0) {
                         return (
-                          <div className="pwa-outcome-line">
-                            <span className="pwa-outcome-nobonus">No bonus · No loss</span>
+                          <div className={styles.pwaOutcomeLine}>
+                            <span className={styles.pwaOutcomeNobonus}>No bonus · No loss</span>
                           </div>
                         )
                       }
@@ -385,8 +399,8 @@ export function MatchDetailPanel({
                           (os) => os.voteCount > 0,
                         )
                         return (
-                          <div className="pwa-outcome-line">
-                            <span className="pwa-outcome-wrong">
+                          <div className={styles.pwaOutcomeLine}>
+                            <span className={styles.pwaOutcomeWrong}>
                               Not answered ·{' '}
                               {allOptionsHaveVoters
                                 ? `−${question.credits.toFixed(2)} cr auto-loss`
@@ -401,23 +415,23 @@ export function MatchDetailPanel({
                       const bonus = myOptionStat?.potentialWinCredits ?? 0
                       const hasUnvotedOptions = stats.optionStats.some((os) => os.voteCount === 0)
                       return (
-                        <div className="pwa-outcome-line">
+                        <div className={styles.pwaOutcomeLine}>
                           {bonus > 0 ? (
-                            <span className="pwa-outcome-correct">
+                            <span className={styles.pwaOutcomeCorrect}>
                               If correct: +{bonus.toFixed(2)} cr
                             </span>
                           ) : (
-                            <span className="pwa-outcome-nobonus">If correct: No bonus</span>
+                            <span className={styles.pwaOutcomeNobonus}>If correct: No bonus</span>
                           )}
-                          <span className="pwa-outcome-sep">·</span>
+                          <span className={styles.pwaOutcomeSep}>·</span>
                           {allOtherOptionsUnvoted ? (
-                            <span className="pwa-outcome-nobonus">If wrong: No loss</span>
+                            <span className={styles.pwaOutcomeNobonus}>If wrong: No loss</span>
                           ) : hasUnvotedOptions ? (
-                            <span className="pwa-outcome-wrong">
+                            <span className={styles.pwaOutcomeWrong}>
                               If wrong: May lose −{question.credits.toFixed(2)} cr
                             </span>
                           ) : (
-                            <span className="pwa-outcome-wrong">
+                            <span className={styles.pwaOutcomeWrong}>
                               If wrong: −{question.credits.toFixed(2)} cr
                             </span>
                           )}
@@ -434,46 +448,46 @@ export function MatchDetailPanel({
       {/* ── Betting stats modal ────────────────────────────────────────── */}
       {showStatsModal ? (
         <div
-          className="pwa-stats-modal-overlay"
+          className={styles.pwaStatsModalOverlay}
           onClick={(e) => {
             if (e.target === e.currentTarget) setShowStatsModal(false)
           }}
         >
-          <div className="pwa-stats-modal">
-            <div className="pwa-stats-modal-header">
+          <div className={styles.pwaStatsModal}>
+            <div className={styles.pwaStatsModalHeader}>
               <h3>Betting Stats</h3>
               <button
                 type="button"
-                className="pwa-stats-modal-close"
+                className={styles.pwaStatsModalClose}
                 onClick={() => setShowStatsModal(false)}
               >
                 ✕
               </button>
             </div>
-            <div className="pwa-stats-modal-body">
+            <div className={styles.pwaStatsModalBody}>
               {questions
                 .filter((q) => q.bettingStats)
                 .map((question) => {
                   const selectedOption = questionSelections[question.id]
                   return (
-                    <div key={question.id} className="pwa-stats-modal-question">
-                      <div className="pwa-stats-modal-question-title">
+                    <div key={question.id} className={styles.pwaStatsModalQuestion}>
+                      <div className={styles.pwaStatsModalQuestionTitle}>
                         {question.sequence}. {question.questionText}
                       </div>
-                      <div className="pwa-betting-summary">
-                        <span className="pwa-stat-pill">
+                      <div className={styles.pwaBettingSummary}>
+                        <span className={styles.pwaStatPill}>
                           {question.bettingStats!.totalEligible} eligible
                         </span>
-                        <span className="pwa-stat-pill pwa-stat-pill--green">
+                        <span className={`${styles.pwaStatPill} ${styles.pwaStatPillGreen}`}>
                           {question.bettingStats!.totalVotes} answered
                         </span>
                         {question.bettingStats!.unansweredCount > 0 && (
-                          <span className="pwa-stat-pill pwa-stat-pill--red">
+                          <span className={`${styles.pwaStatPill} ${styles.pwaStatPillRed}`}>
                             {question.bettingStats!.unansweredCount} unanswered
                           </span>
                         )}
                       </div>
-                      <div className="pwa-option-stats">
+                      <div className={styles.pwaOptionStats}>
                         {question.bettingStats!.optionStats.map((os) => {
                           const option = question.options.find((o) => o.id === os.optionId)
                           const pct =
@@ -484,39 +498,39 @@ export function MatchDetailPanel({
                           return (
                             <div
                               key={os.optionId}
-                              className={`pwa-option-stat${isMyPick ? ' pwa-option-stat--mine' : ''}`}
+                              className={isMyPick ? `${styles.pwaOptionStat} ${styles.pwaOptionStatMine}` : styles.pwaOptionStat}
                             >
-                              <div className="pwa-option-stat-row">
-                                <span className="pwa-option-stat-name">
+                              <div className={styles.pwaOptionStatRow}>
+                                <span className={styles.pwaOptionStatName}>
                                   {option?.optionText ?? `Option ${os.optionId}`}
                                 </span>
-                                <span className="pwa-option-stat-count">
+                                <span className={styles.pwaOptionStatCount}>
                                   {os.voteCount}/{question.bettingStats!.totalEligible}
                                 </span>
                                 {os.potentialWinCredits > 0 ? (
-                                  <span className="pwa-option-win">
+                                  <span className={styles.pwaOptionWin}>
                                     +{os.potentialWinCredits.toFixed(2)} cr
                                   </span>
                                 ) : (
-                                  <span className="pwa-option-nowin">No bonus</span>
+                                  <span className={styles.pwaOptionNowin}>No bonus</span>
                                 )}
                               </div>
-                              <div className="pwa-bar-track">
+                              <div className={styles.pwaBarTrack}>
                                 <div
-                                  className={`pwa-bar-fill pwa-bar-fill--${os.optionId}`}
+                                  className={`${styles.pwaBarFill} ${styles[`pwa-bar-fill--${os.optionId}`] ?? ''}`}
                                   style={{ width: `${pct}%` }}
                                 />
                               </div>
                               {os.voters.length > 0 && (
-                                <div className="pwa-voter-chips">
+                                <div className={styles.pwaVoterChips}>
                                   {os.voters.map((v) => (
                                     <span
                                       key={v.userId}
-                                      className={`pwa-voter-chip${
+                                      className={
                                         selectedOption === os.optionId
-                                          ? ' pwa-voter-chip--mine'
-                                          : ''
-                                      }`}
+                                          ? `${styles.pwaVoterChip} ${styles.pwaVoterChipMine}`
+                                          : styles.pwaVoterChip
+                                      }
                                     >
                                       {v.userName}
                                     </span>

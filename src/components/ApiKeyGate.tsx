@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { api, clearApiKey, setApiKey } from '../lib/api'
+import styles from './ApiKeyGate.module.css'
 
 interface Props {
   onAuthenticated: () => void
@@ -32,19 +33,19 @@ export function ApiKeyGate({ onAuthenticated }: Props) {
   }
 
   return (
-    <div className="gate-shell">
-      <div className="gate-card">
-        <div className="gate-brand">
+    <div className={styles.gateShell}>
+      <div className={styles.gateCard}>
+        <div className={styles.gateBrand}>
           <p className="eyebrow">IPL Questions Game</p>
-          <h1 className="gate-title">IPL Gaming Arena</h1>
+          <h1 className={styles.gateTitle}>IPL Gaming Arena</h1>
         </div>
 
-        <p className="gate-subtitle">Enter your API key to access the game</p>
+        <p className={styles.gateSubtitle}>Enter your API key to access the game</p>
 
-        <form className="gate-form" onSubmit={handleSubmit}>
-          <div className="gate-input-wrap">
+        <form className={styles.gateForm} onSubmit={handleSubmit}>
+          <div className={styles.gateInputWrap}>
             <input
-              className="gate-input"
+              className={styles.gateInput}
               type={showKey ? 'text' : 'password'}
               placeholder="Paste your API key…"
               value={key}
@@ -57,7 +58,7 @@ export function ApiKeyGate({ onAuthenticated }: Props) {
             />
             <button
               type="button"
-              className="gate-eye-btn"
+              className={styles.gateEyeBtn}
               aria-label={showKey ? 'Hide key' : 'Show key'}
               onClick={() => setShowKey(v => !v)}
             >
@@ -65,10 +66,10 @@ export function ApiKeyGate({ onAuthenticated }: Props) {
             </button>
           </div>
 
-          {error !== null && <p className="gate-error">{error}</p>}
+          {error !== null && <p className={styles.gateError}>{error}</p>}
 
           <button
-            className="gate-btn"
+            className={styles.gateBtn}
             type="submit"
             disabled={loading || !key.trim()}
           >

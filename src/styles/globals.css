@@ -1,0 +1,154 @@
+/* ── CSS variables ──────────────────────────────────────────────────────── */
+:root {
+  --ink: #0c1220;
+  --paper: #fff9f0;
+  --sun: #ffb703;
+  --flame: #fb8500;
+  --teal: #219ebc;
+  --mint: #7ad995;
+  --rose: #ef476f;
+}
+
+/* ── App shell ──────────────────────────────────────────────────────────── */
+.app-shell {
+  min-height: 100vh;
+  padding: 1rem;
+  padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+  color: var(--paper);
+  background:
+    radial-gradient(circle at 10% 10%, #274060 0%, transparent 35%),
+    radial-gradient(circle at 90% 0%, #4b2e39 0%, transparent 30%),
+    linear-gradient(160deg, #101c36 0%, #2d1e2f 45%, #0c1220 100%);
+}
+
+.offline-banner {
+  max-width: 1220px;
+  margin: 0 auto 0.75rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 0.5rem;
+  background: #ff8fa322;
+  border: 1px solid #ff8fa366;
+  color: #ff8fa3;
+  font-size: 0.88rem;
+}
+
+/* ── Layout grid ────────────────────────────────────────────────────────── */
+.layout-grid {
+  max-width: 1220px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 1rem;
+}
+
+.layout-grid > article {
+  min-width: 0;
+}
+
+/* ── Panel card ─────────────────────────────────────────────────────────── */
+.panel {
+  max-width: 1220px;
+  margin: 0 auto;
+  background: #ffffff10;
+  border: 1px solid #ffffff1a;
+  border-radius: 1rem;
+  padding: 1.25rem;
+  backdrop-filter: blur(8px);
+}
+
+.panel h2 {
+  margin: 0 0 0.2rem;
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+/* ── Tabs ───────────────────────────────────────────────────────────────── */
+.tabs {
+  max-width: 1220px;
+  margin: 0 auto 1rem;
+  display: flex;
+  gap: 0.65rem;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tab {
+  flex: 1 1 0;
+  min-width: max-content;
+  min-height: 44px;
+  border: 1px solid #ffffff2e;
+  background: #ffffff0d;
+  color: #fff;
+  border-radius: 999px;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+}
+
+.tab.active {
+  background: linear-gradient(90deg, var(--teal), #3a86ff);
+  border-color: transparent;
+}
+
+/* ── Subtle text ────────────────────────────────────────────────────────── */
+.subtle {
+  margin: 0.25rem 0 0.85rem;
+  opacity: 0.65;
+  font-size: 0.88rem;
+}
+
+/* ── Match status chips — shared across MatchesPage and MatchDetailPanel ── */
+.match-status-chip {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.match-status-chip--0 { background: #ffffff0d; border-color: #ffffff18; color: #ffffff55; }
+.match-status-chip--1 { background: #ffb70322; border-color: #ffb70355; color: var(--sun); }
+.match-status-chip--2 { background: #ef476f22; border-color: #ef476f55; color: #ff8fa3; }
+.match-status-chip--3 { background: #219ebc22; border-color: #219ebc55; color: #6dd5ed; }
+.match-status-chip--4 { background: #7ad99522; border-color: #7ad99555; color: var(--mint); }
+.match-status-chip--5 { background: #7ad99533; border-color: #7ad99577; color: var(--mint); }
+
+/* ── Body state ─────────────────────────────────────────────────────────── */
+body.menu-open {
+  overflow: hidden;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .app-shell {
+    padding: 0.85rem;
+    padding-bottom: calc(0.85rem + env(safe-area-inset-bottom));
+  }
+
+  .layout-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .layout-grid--detail > article:first-child {
+    display: none;
+  }
+
+  .panel {
+    padding: 0.85rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .subtle {
+    font-size: 0.84rem;
+  }
+
+  .tab {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+}

@@ -1,4 +1,5 @@
-﻿import type { ApiUser } from '../../lib/api'
+﻿import styles from './UserDetailsPage.module.css'
+import type { ApiUser } from '../../lib/api'
 
 interface UserDetailsPageProps {
   user: ApiUser | null
@@ -11,31 +12,31 @@ export function UserDetailsPage({
 }: UserDetailsPageProps) {
 
   return (
-    <section className="panel user-panel">
+    <section className={`panel ${styles.userPanel}`}>
       <h2>User Details</h2>
       {user ? (
         <>
-          <div className="user-details-grid">
-            <div className="user-stat-card">
+          <div className={styles.userDetailsGrid}>
+            <div className={styles.userStatCard}>
               <p className="subtle">Name</p>
               <strong>{user.name}</strong>
             </div>
-            <div className="user-stat-card">
+            <div className={styles.userStatCard}>
               <p className="subtle">Email</p>
               <strong style={{ fontSize: '0.88rem', wordBreak: 'break-all' }}>{user.email}</strong>
             </div>
-            <div className="user-stat-card">
+            <div className={styles.userStatCard}>
               <p className="subtle">Phone</p>
               <strong>{user.phoneNumber || 'â€”'}</strong>
             </div>
-            <div className="user-stat-card">
+            <div className={styles.userStatCard}>
               <p className="subtle">Joined</p>
               <strong>{new Date(user.createdDate).toLocaleDateString('en-IN')}</strong>
             </div>
           </div>
 
           <h3 className="user-section-title">Credits</h3>
-          <div className="user-stat-card">
+          <div className={styles.userStatCard}>
             <p className="subtle">Current Credits</p>
             <strong style={{ fontSize: '1.5rem', color: 'var(--sun)' }}>{currentCredits.toFixed(2)}</strong>
           </div>

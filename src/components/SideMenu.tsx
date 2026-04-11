@@ -1,3 +1,5 @@
+import styles from './SideMenu.module.css'
+
 export type AppScreen =
   | 'home'
   | 'matches'
@@ -29,21 +31,21 @@ export function SideMenu({
 }: SideMenuProps) {
   return (
     <>
-      <aside className={`side-menu ${isOpen ? 'open' : ''}`} aria-hidden={!isOpen}>
-        <div className="side-menu-head">
+      <aside className={`${styles.sideMenu} ${isOpen ? styles.open : ''}`} aria-hidden={!isOpen}>
+        <div className={styles.sideMenuHead}>
           <p className="eyebrow">Navigation</p>
-          <button type="button" className="side-menu-close" onClick={onClose}>
+          <button type="button" className={styles.sideMenuClose} onClick={onClose}>
             Close
           </button>
         </div>
-        <nav className="side-menu-nav" aria-label="Main menu">
+        <nav className={styles.sideMenuNav} aria-label="Main menu">
           {MENU_ITEMS.map((item) => {
             const isActive = activeScreen === item.key
             return (
               <button
                 key={item.key}
                 type="button"
-                className={isActive ? 'side-menu-link active' : 'side-menu-link'}
+                className={`${styles.sideMenuLink}${isActive ? ' ' + styles.active : ''}`}
                 onClick={() => {
                   onNavigate(item.key)
                   onClose()
@@ -55,7 +57,7 @@ export function SideMenu({
           })}
         </nav>
       </aside>
-      {isOpen ? <button type="button" className="side-menu-backdrop" onClick={onClose} /> : null}
+      {isOpen ? <button type="button" className={styles.sideMenuBackdrop} onClick={onClose} /> : null}
     </>
   )
 }

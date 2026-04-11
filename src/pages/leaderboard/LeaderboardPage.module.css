@@ -1,0 +1,93 @@
+.history-table-wrap {
+  overflow-x: auto;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.history-table th {
+  padding: 0.55rem 0.65rem;
+  text-align: left;
+  border-bottom: 1px solid #ffffff18;
+  white-space: nowrap;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  opacity: 0.55;
+  font-weight: 600;
+}
+
+.history-table td {
+  padding: 0.6rem 0.65rem;
+  text-align: left;
+  border-bottom: 1px solid #ffffff0d;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.history-table tbody tr:hover {
+  background: #ffffff06;
+}
+
+@media (max-width: 900px) {
+  .history-table th,
+  .history-table td {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* ── Current user row ───────────────────────────────────────────────────── */
+.lb-row--me {
+  background: rgba(234, 179, 8, 0.12);
+}
+
+.lb-row--me:hover {
+  background: rgba(234, 179, 8, 0.18);
+}
+
+/* ── Leaderboard variant (center all except Name) ───────────────────────── */
+.history-table--lb th,
+.history-table--lb td {
+  text-align: center;
+}
+
+.history-table--lb th:nth-child(2),
+.history-table--lb td:nth-child(2) {
+  text-align: left;
+}
+
+@media (max-width: 640px) {
+  .history-table--lb th,
+  .history-table--lb td {
+    padding: 0.45rem 0.35rem;
+    font-size: 0.72rem;
+  }
+}
+
+/* ── Status pills ───────────────────────────────────────────────────────── */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  padding: 0.15rem 0.45rem;
+  border: 1px solid #ffffff2f;
+  text-transform: capitalize;
+}
+
+.pill.won {
+  background: #1f9d623d;
+}
+
+.pill.lost,
+.pill.penalized {
+  background: #d7263d3d;
+}
+
+.pill.locked_pending,
+.pill.open {
+  background: #3a86ff33;
+}

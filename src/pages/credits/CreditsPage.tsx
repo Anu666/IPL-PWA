@@ -1,4 +1,5 @@
 ﻿import { useEffect, useState } from 'react'
+import styles from './CreditsPage.module.css'
 import matchSchedule from '../../assets/json/match-schedule.json'
 import { api } from '../../lib/api'
 import {
@@ -46,18 +47,18 @@ const TYPE_FILTER_OPTIONS: Array<{ value: TypeFilter; label: string }> = [
 
 function typeBadgeClass(type: TransactionType): string {
   switch (type) {
-    case TransactionType.Deposit:         return 'credits-badge credits-badge--deposit'
-    case TransactionType.Withdrawal:      return 'credits-badge credits-badge--withdrawal'
-    case TransactionType.MatchSettlement: return 'credits-badge credits-badge--settlement'
-    case TransactionType.AdminOverride:   return 'credits-badge credits-badge--override'
-    default:                              return 'credits-badge'
+    case TransactionType.Deposit:         return `${styles.creditsBadge} ${styles.creditsBadgeDeposit}`
+    case TransactionType.Withdrawal:      return `${styles.creditsBadge} ${styles.creditsBadgeWithdrawal}`
+    case TransactionType.MatchSettlement: return `${styles.creditsBadge} ${styles.creditsBadgeSettlement}`
+    case TransactionType.AdminOverride:   return `${styles.creditsBadge} ${styles.creditsBadgeOverride}`
+    default:                              return styles.creditsBadge
   }
 }
 
 function statusBadgeClass(status: TransactionStatus): string {
   return status === TransactionStatus.Completed
-    ? 'credits-badge credits-badge--completed'
-    : 'credits-badge credits-badge--pending'
+    ? `${styles.creditsBadge} ${styles.creditsBadgeCompleted}`
+    : `${styles.creditsBadge} ${styles.creditsBadgePending}`
 }
 
 export function CreditsPage({ currentCredits }: CreditsPageProps) {
@@ -90,21 +91,21 @@ export function CreditsPage({ currentCredits }: CreditsPageProps) {
       : transactions.filter((t) => t.type === typeFilter)
 
   return (
-    <div className="credits-page">
+    <div className={styles.creditsPage}>
       {/* â”€â”€ Balance hero â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
-      <div className="credits-hero">
-        <p className="credits-hero-label">Current Balance</p>
-        <p className="credits-hero-amount">{currentCredits.toFixed(2)}</p>
-        <p className="credits-hero-unit">credits</p>
+      <div className={styles.creditsHero}>
+        <p className={styles.creditsHeroLabel}>Current Balance</p>
+        <p className={styles.creditsHeroAmount}>{currentCredits.toFixed(2)}</p>
+        <p className={styles.creditsHeroUnit}>credits</p>
       </div>
 
       {/* â”€â”€ Type filter chips â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
-      <div className="credits-filters">
+      <div className={styles.creditsFilters}>
         {TYPE_FILTER_OPTIONS.map((opt) => (
           <button
             key={String(opt.value)}
             type="button"
-            className={`credits-chip${typeFilter === opt.value ? ' active' : ''}`}
+            className={typeFilter === opt.value ? `${styles.creditsChip} ${styles.active}` : styles.creditsChip}
             onClick={() => setTypeFilter(opt.value)}
           >
             {opt.label}
@@ -113,7 +114,7 @@ export function CreditsPage({ currentCredits }: CreditsPageProps) {
       </div>
 
       {/* â”€â”€ Results â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
-      <div className="panel credits-table-panel">
+      <div className={`panel ${styles.creditsTablePanel}`}>
         {loading && (
           <p className="subtle" style={{ textAlign: 'center', padding: '1.5rem 0' }}>
             Loading transactionsâ€¦
@@ -137,8 +138,8 @@ export function CreditsPage({ currentCredits }: CreditsPageProps) {
             <p className="subtle" style={{ marginBottom: '0.75rem' }}>
               {filtered.length} transaction{filtered.length !== 1 ? 's' : ''}
             </p>
-            <div className="credits-table-scroll">
-              <table className="credits-table">
+            <div className={styles.creditsTableScroll}>
+              <table className={styles.creditsTable}>
                 <thead>
                   <tr>
                     <th>Date</th>
@@ -151,20 +152,20 @@ export function CreditsPage({ currentCredits }: CreditsPageProps) {
                 <tbody>
                   {filtered.map((t) => (
                     <tr key={t.id}>
-                      <td className="credits-td-date">{formatDateTime(t.createdAt)}</td>
+                      <td className={styles.creditsTdDate}>{formatDateTime(t.createdAt)}</td>
                       <td>
                         <span className={typeBadgeClass(t.type)}>
                           {TRANSACTION_TYPE_LABELS[t.type] ?? t.type}
                         </span>
                       </td>
-                      <td className="credits-td-match">
+                      <td className={styles.creditsTdMatch}>
                         {t.matchId ? (matchLookup.get(t.matchId) ?? 'â€”') : 'â€”'}
                       </td>
                       <td
                         className={
                           t.overallCreditChange >= 0
-                            ? 'credits-td-amount credits-td-amount--positive'
-                            : 'credits-td-amount credits-td-amount--negative'
+                            ? `${styles.creditsTdAmount} ${styles.creditsTdAmountPositive}`
+                            : `${styles.creditsTdAmount} ${styles.creditsTdAmountNegative}`
                         }
                       >
                         {t.overallCreditChange >= 0 ? '+' : ''}

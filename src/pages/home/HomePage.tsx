@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import styles from './HomePage.module.css'
 import { countdownLabel, isClosed, toDisplayDate } from '../../lib/time'
 import { MatchStatusValue } from '../../lib/types'
 import type { Match } from '../../lib/types'
@@ -175,36 +176,36 @@ export function HomePage({ userId }: HomePageProps) {
     : false
 
   return (
-    <div className="home-wrapper">
+    <div className={styles.homeWrapper}>
       {/* Group filter chips */}
       {activeGroups.length > 0 && (
-        <div className="home-status-filters">
+        <div className={styles.homeStatusFilters}>
           {activeGroups.map((g) => (
             <button
               key={g}
               type="button"
-              className={`home-status-filter-chip home-group-chip${selectedGroup === g ? ' active' : ''}`}
+              className={`${styles.homeStatusFilterChip} ${styles.homeGroupChip}${selectedGroup === g ? ' ' + styles.active : ''}`}
               onClick={() => setSelectedGroup(g)}
             >
               {GROUP_LABELS[g]}
-              <span className="home-status-filter-count">{groupCounts[g]}</span>
+              <span className={styles.homeStatusFilterCount}>{groupCounts[g]}</span>
             </button>
           ))}
         </div>
       )}
 
-      <section className="panel home-panel">
+      <section className={`panel ${styles.homePanel}`}>
         {/* Match switcher chips — when multiple matches in group */}
         {visibleMatches.length > 1 && (
-          <div className="home-match-chips">
+          <div className={styles.homeMatchChips}>
             {visibleMatches.map((m) => (
               <button
                 key={m.id}
                 type="button"
-                className={`home-match-chip${m.id === selectedHomeMatchId ? ' active' : ''}`}
+                className={m.id === selectedHomeMatchId ? `${styles.homeMatchChip} ${styles.active}` : styles.homeMatchChip}
                 onClick={() => setSelectedHomeMatchId(m.id)}
               >
-                <span className="home-match-chip-teams">
+                <span className={styles.homeMatchChipTeams}>
                   {m.firstBattingTeamCode} vs {m.secondBattingTeamCode}
                 </span>
               </button>
@@ -214,13 +215,13 @@ export function HomePage({ userId }: HomePageProps) {
 
         {selectedHomeMatch ? (
           <>
-            <div className="home-match-header">
-              <div className="home-match-teams">
-                <span className="home-team">{selectedHomeMatch.firstBattingTeamCode}</span>
-                <span className="home-vs">vs</span>
-                <span className="home-team">{selectedHomeMatch.secondBattingTeamCode}</span>
+            <div className={styles.homeMatchHeader}>
+              <div className={styles.homeMatchTeams}>
+                <span className={styles.homeTeam}>{selectedHomeMatch.firstBattingTeamCode}</span>
+                <span className={styles.homeVs}>vs</span>
+                <span className={styles.homeTeam}>{selectedHomeMatch.secondBattingTeamCode}</span>
               </div>
-              <p className="subtle home-match-name">{selectedHomeMatch.matchName}</p>
+              <p className={`subtle ${styles.homeMatchName}`}>{selectedHomeMatch.matchName}</p>
               <p className="subtle">{selectedHomeMatch.groundName}, {selectedHomeMatch.city}</p>
               <p className="subtle">
                 {toDisplayDate(effectiveMatchStartDate)}&ensp;·&ensp;

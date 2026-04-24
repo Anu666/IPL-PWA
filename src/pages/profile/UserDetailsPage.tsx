@@ -27,7 +27,7 @@ export function UserDetailsPage({
             </div>
             <div className={styles.userStatCard}>
               <p className="subtle">Phone</p>
-              <strong>{user.phoneNumber || 'â€”'}</strong>
+              <strong>{user.phoneNumber || '—'}</strong>
             </div>
             <div className={styles.userStatCard}>
               <p className="subtle">Joined</p>

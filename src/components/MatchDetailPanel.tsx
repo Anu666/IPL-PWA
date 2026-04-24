@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
+import { createPortal } from 'react-dom'
 import { isClosed } from '../lib/time'
 import { MatchStatusValue, MATCH_STATUS_LABELS, OutcomeType } from '../lib/types'
 import type { MatchStatusRecord, Question } from '../lib/types'
@@ -445,8 +446,8 @@ export function MatchDetailPanel({
         </div>
       ) : null}
 
-      {/* ── Betting stats modal ────────────────────────────────────────── */}
-      {showStatsModal ? (
+      {/* ── Betting stats modal (portal → document.body, bypasses backdrop-filter) ── */}
+      {showStatsModal ? createPortal(
         <div
           className={styles.pwaStatsModalOverlay}
           onClick={(e) => {
@@ -547,7 +548,7 @@ export function MatchDetailPanel({
             </div>
           </div>
         </div>
-      ) : null}
+      , document.body) : null}
         </>
       )}
     </>

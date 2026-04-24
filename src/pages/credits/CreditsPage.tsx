@@ -24,7 +24,7 @@ const matchLookup = new Map(
 )
 
 function formatDateTime(iso: string): string {
-  if (!iso) return 'â€”'
+  if (!iso) return '—'
   const d = new Date(iso)
   if (isNaN(d.getTime())) return iso
   return d.toLocaleString('en-IN', {
@@ -117,7 +117,7 @@ export function CreditsPage({ currentCredits }: CreditsPageProps) {
       <div className={`panel ${styles.creditsTablePanel}`}>
         {loading && (
           <p className="subtle" style={{ textAlign: 'center', padding: '1.5rem 0' }}>
-            Loading transactionsâ€¦
+            Loading transactions…
           </p>
         )}
 
@@ -159,7 +159,7 @@ export function CreditsPage({ currentCredits }: CreditsPageProps) {
                         </span>
                       </td>
                       <td className={styles.creditsTdMatch}>
-                        {t.matchId ? (matchLookup.get(t.matchId) ?? 'â€”') : 'â€”'}
+                        {t.matchId ? (matchLookup.get(t.matchId) ?? '—') : '—'}
                       </td>
                       <td
                         className={

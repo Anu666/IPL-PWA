@@ -120,14 +120,16 @@ export function MatchesPage({ userId }: MatchesPageProps) {
               >
                 <div className={styles.matchCardHead}>
                   <span>
-                    {match.firstBattingTeamCode} vs {match.secondBattingTeamCode}
+                    {match.firstBattingTeamCode
+                      ? `${match.firstBattingTeamCode} vs ${match.secondBattingTeamCode}`
+                      : 'IPL 2026'}
                   </span>
                   <span className={`match-status-chip match-status-chip--${effectiveStatus}`}>
                     {MATCH_STATUS_LABELS[effectiveStatus]}
                     {matchIsDelayed ? ' · Delayed' : ''}
                   </span>
                 </div>
-                <p>{match.matchName}</p>
+                {match.firstBattingTeamCode && <p>{match.matchName}</p>}
                 <small>
                   {toDisplayDate(effectiveStartDate)} | {closeLabel}
                 </small>
@@ -146,7 +148,7 @@ export function MatchesPage({ userId }: MatchesPageProps) {
           ← Back to matches
         </button>
         <h2>{selectedMatch ? selectedMatch.matchName : 'Select a match'}</h2>
-        {selectedMatch ? (
+        {selectedMatch?.firstBattingTeamCode && (
           <p className="subtle">
             {selectedMatch.groundName}, {selectedMatch.city} | Starts{' '}
             {toDisplayDate(
@@ -154,7 +156,7 @@ export function MatchesPage({ userId }: MatchesPageProps) {
                 selectedMatch.matchCommenceStartDate,
             )}
           </p>
-        ) : null}
+        )}
 
         {selectedMatch && (
           <MatchDetailPanel

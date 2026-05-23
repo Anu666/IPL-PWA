@@ -206,7 +206,7 @@ export function HomePage({ userId }: HomePageProps) {
                 onClick={() => setSelectedHomeMatchId(m.id)}
               >
                 <span className={styles.homeMatchChipTeams}>
-                  {m.firstBattingTeamCode} vs {m.secondBattingTeamCode}
+                  {m.firstBattingTeamCode ? `${m.firstBattingTeamCode} vs ${m.secondBattingTeamCode}` : 'IPL 2026'}
                 </span>
               </button>
             ))}
@@ -216,13 +216,19 @@ export function HomePage({ userId }: HomePageProps) {
         {selectedHomeMatch ? (
           <>
             <div className={styles.homeMatchHeader}>
-              <div className={styles.homeMatchTeams}>
-                <span className={styles.homeTeam}>{selectedHomeMatch.firstBattingTeamCode}</span>
-                <span className={styles.homeVs}>vs</span>
-                <span className={styles.homeTeam}>{selectedHomeMatch.secondBattingTeamCode}</span>
-              </div>
-              <p className={`subtle ${styles.homeMatchName}`}>{selectedHomeMatch.matchName}</p>
-              <p className="subtle">{selectedHomeMatch.groundName}, {selectedHomeMatch.city}</p>
+              {selectedHomeMatch.firstBattingTeamCode ? (
+                <>
+                  <div className={styles.homeMatchTeams}>
+                    <span className={styles.homeTeam}>{selectedHomeMatch.firstBattingTeamCode}</span>
+                    <span className={styles.homeVs}>vs</span>
+                    <span className={styles.homeTeam}>{selectedHomeMatch.secondBattingTeamCode}</span>
+                  </div>
+                  <p className={`subtle ${styles.homeMatchName}`}>{selectedHomeMatch.matchName}</p>
+                </>
+              ) : (
+                <p className={styles.homeMatchName}>{selectedHomeMatch.matchName}</p>
+              )}
+              {selectedHomeMatch.firstBattingTeamCode && <p className="subtle">{selectedHomeMatch.groundName}, {selectedHomeMatch.city}</p>}
               <p className="subtle">
                 {toDisplayDate(effectiveMatchStartDate)}&ensp;·&ensp;
                 {isDelayed

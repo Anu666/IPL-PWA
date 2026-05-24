@@ -6,6 +6,7 @@ import { api, clearApiKey, getApiKey, type ApiUser } from './lib/api'
 import { HomePage } from './pages/home/HomePage'
 import { MatchesPage } from './pages/matches/MatchesPage'
 import { LeaderboardPage } from './pages/leaderboard/LeaderboardPage'
+import { AwardsPage } from './pages/awards/AwardsPage'
 import { CreditsPage } from './pages/credits/CreditsPage'
 import { UserDetailsPage } from './pages/profile/UserDetailsPage'
 
@@ -13,7 +14,7 @@ function App() {
   const [isOffline, setIsOffline] = useState(!navigator.onLine)
   const [activeScreen, setActiveScreen] = useState<AppScreen>(() => {
     const saved = localStorage.getItem('pwa-screen')
-    const valid: AppScreen[] = ['home', 'matches', 'leaderboard', 'credits', 'userDetails', 'historyHidden']
+    const valid: AppScreen[] = ['home', 'matches', 'leaderboard', 'awards', 'credits', 'userDetails', 'historyHidden']
     return (valid.includes(saved as AppScreen) ? saved : 'home') as AppScreen
   })
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -178,6 +179,12 @@ function App() {
       {mountedScreens.has('leaderboard') && (
         <div hidden={activeScreen !== 'leaderboard'}>
           <LeaderboardPage userId={userId} />
+        </div>
+      )}
+
+      {mountedScreens.has('awards') && (
+        <div hidden={activeScreen !== 'awards'}>
+          <AwardsPage userId={userId} />
         </div>
       )}
 

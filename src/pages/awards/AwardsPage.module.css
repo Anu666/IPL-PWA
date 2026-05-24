@@ -1,0 +1,218 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0.875rem;
+  margin-top: 1rem;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.emoji {
+  font-size: 2rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.title {
+  margin: 0 0 0.15rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.description {
+  margin: 0;
+  font-size: 0.72rem;
+  opacity: 0.55;
+  line-height: 1.4;
+}
+
+.winners {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+/* ── First place highlight ── */
+.firstPlace {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0.75rem 0.5rem 0.6rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 0.25rem;
+  gap: 0.1rem;
+}
+
+.firstPlaceSelf {
+  background: linear-gradient(135deg, rgba(255, 183, 3, 0.32), rgba(251, 133, 0, 0.22));
+  border-color: rgba(255, 183, 3, 0.55);
+}
+
+.firstPlaceCrown {
+  font-size: 1.4rem;
+  line-height: 1;
+  margin-bottom: 0.2rem;
+}
+
+.firstPlaceName {
+  font-size: 0.95rem;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.firstPlaceSelf .firstPlaceName {
+  color: #ffda6a;
+}
+
+.firstPlaceValue {
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.75;
+}
+
+.firstPlaceSelf .firstPlaceValue {
+  color: #ffd166;
+  opacity: 0.9;
+}
+
+.winnerRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  padding: 0.25rem 0.4rem;
+  border-radius: 6px;
+}
+
+.winnerRow.self {
+  background: rgba(33, 158, 188, 0.18);
+}
+
+.medal {
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
+.winnerName {
+  flex: 1;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.winnerValue {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.65;
+  font-size: 0.78rem;
+}
+
+.noWinners {
+  margin: 0;
+  font-size: 0.78rem;
+  opacity: 0.45;
+}
+
+.viewAll {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-top: 0.1rem;
+  color: #7ad995;
+  font-size: 0.78rem;
+  cursor: pointer;
+  text-align: left;
+  opacity: 0.85;
+}
+
+.viewAll:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+/* ── Detail view ── */
+.backBtn {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.82rem;
+  color: inherit;
+  cursor: pointer;
+  margin-bottom: 1.25rem;
+  opacity: 0.8;
+}
+
+.backBtn:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.detailHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.detailEmoji {
+  font-size: 2.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.detailTitle {
+  margin: 0 0 0.2rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.detailList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.detailRow {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.88rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
+}
+
+.detailRow.podium {
+  background: rgba(255, 255, 255, 0.05);
+  font-weight: 600;
+}
+
+.detailRow.self {
+  background: rgba(33, 158, 188, 0.18);
+}
+
+.detailRow.podium.self {
+  background: rgba(33, 158, 188, 0.22);
+}

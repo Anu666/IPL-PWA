@@ -206,3 +206,19 @@ export interface UserHistoryEntry {
   note: string
   closesAtIst: string
 }
+
+export interface AwardWinner {
+  userId: string
+  userName: string
+  value: number
+  formattedValue: string
+  position: number
+}
+
+export interface AwardCategory {
+  key: string
+  label: string
+  emoji: string
+  description: string
+  winners: AwardWinner[]
+}

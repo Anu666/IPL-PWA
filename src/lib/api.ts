@@ -1,4 +1,4 @@
-import type { Answer, LeaderboardEntry, MatchStatusRecord, Question, Transaction, UserAnswer } from './types'
+import type { Answer, LeaderboardEntry, MatchStatusRecord, Question, Transaction, UserAnswer, AwardCategory } from './types'
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL as string
 const STORAGE_KEY = 'ipl-api-key'
@@ -76,6 +76,9 @@ export const api = {
   },
   leaderboard: {
     get: () => request<LeaderboardEntry[]>('/api/leaderboard/GetLeaderboard'),
+  },
+  awards: {
+    get: () => request<AwardCategory[]>('/api/awards/GetAwards'),
   },
   userAnswers: {
     getByMatchAndUser: (matchId: string, userId: string) =>

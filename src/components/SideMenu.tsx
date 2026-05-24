@@ -4,6 +4,7 @@ export type AppScreen =
   | 'home'
   | 'matches'
   | 'leaderboard'
+  | 'awards'
   | 'credits'
   | 'userDetails'
   | 'historyHidden'
@@ -19,6 +20,7 @@ const MENU_ITEMS: Array<{ key: Exclude<AppScreen, 'historyHidden'>; label: strin
   { key: 'home', label: 'Home' },
   { key: 'matches', label: 'Matches' },
   { key: 'leaderboard', label: 'Leaderboard' },
+  { key: 'awards', label: 'Awards' },
   { key: 'credits', label: 'Credits' },
   { key: 'userDetails', label: 'User Details' },
 ]

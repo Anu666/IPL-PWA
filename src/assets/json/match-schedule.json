@@ -1658,7 +1658,7 @@
   {
     "id": "4b65de20-4b1b-4076-acc1-b46cff68ead1",
     "matchDate": "2026-05-27T00:00:00",
-    "matchName": "Sunrisers Hyderabad vs TBD",
+    "matchName": "Sunrisers Hyderabad vs Rajastan Royals",
     "matchTime": "19:30",
     "gmtMatchTime": "14:00 GMT",
     "gmtMatchDate": "2026-05-27",
@@ -1666,18 +1666,18 @@
     "gmtMatchEndDate": "2026-05-27",
     "firstBattingTeamID": 20,
     "firstBattingTeamName": "Sunrisers Hyderabad",
-    "secondBattingTeamID": 47,
-    "secondBattingTeamName": "TBD",
+    "secondBattingTeamID": 18,
+    "secondBattingTeamName": "Rajastan Royals",
     "firstBattingTeamCode": "SRH",
-    "secondBattingTeamCode": "TBD",
+    "secondBattingTeamCode": "RR",
     "groundID": 131,
     "groundName": "New International Cricket Stadium",
     "matchCommenceStartDate": "2026-05-27T19:30:00",
     "city": "New Chandigarh",
     "homeTeamID": 20,
     "homeTeamName": "Sunrisers Hyderabad",
-    "awayTeamID": 47,
-    "awayTeamName": "TBD"
+    "awayTeamID": 18,
+    "awayTeamName": "Rajastan Royals"
   },
   {
     "id": "57c023da-b66f-458a-b6ab-96dd21d48551",

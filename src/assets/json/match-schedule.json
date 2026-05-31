@@ -1706,7 +1706,7 @@
   {
     "id": "9e38a2bc-edba-4f67-a6d5-67dab3bad19d",
     "matchDate": "2026-05-31T00:00:00",
-    "matchName": "Royal Challengers Bengaluru vs TBD",
+    "matchName": "Royal Challengers Bengaluru vs Gujarat Titans",
     "matchTime": "19:30",
     "gmtMatchTime": "14:00 GMT",
     "gmtMatchDate": "2026-05-31",
@@ -1714,18 +1714,18 @@
     "gmtMatchEndDate": "2026-05-31",
     "firstBattingTeamID": 19,
     "firstBattingTeamName": "Royal Challengers Bengaluru",
-    "secondBattingTeamID": 48,
-    "secondBattingTeamName": "TBD",
+    "secondBattingTeamID": 35,
+    "secondBattingTeamName": "Gujarat Titans",
     "firstBattingTeamCode": "RCB",
-    "secondBattingTeamCode": "TBD",
+    "secondBattingTeamCode": "GT",
     "groundID": 55,
     "groundName": "Narendra Modi Stadium",
     "matchCommenceStartDate": "2026-05-31T19:30:00",
     "city": "Ahmedabad",
     "homeTeamID": 19,
     "homeTeamName": "Royal Challengers Bengaluru",
-    "awayTeamID": 48,
-    "awayTeamName": "TBD"
+    "awayTeamID": 35,
+    "awayTeamName": "Gujarat Titans"
   },
   {
     "id": "1cc755fc-1b5c-47b2-bfe1-f956e4ba3c15",
